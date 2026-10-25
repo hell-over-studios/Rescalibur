@@ -2,8 +2,9 @@
  * Único módulo que se comunica con el backend.
  * Los componentes nunca llaman a fetch directamente.
  */
-import { URL_API } from '../constantes';
-import type { InfoImagen } from '../tipos';
+import { URL_API, USAR_SIMULADO } from '../constantes';
+import type { InfoImagen, OpcionResolucion, ResultadoReescalado } from '../tipos';
+import * as apiSimulada from './apiSimulada';
 
 /**
  * Lee el mensaje de error que envía FastAPI ({"detail": "..."}).
@@ -18,17 +19,11 @@ async function leerMensajeError(respuesta: Response): Promise<string> {
   }
 }
 
-/**
- * Envía la imagen al backend y obtiene su resolución y las opciones de salida (HU-02).
- * @param archivo Imagen seleccionada por el usuario.
- */
-export async function obtenerInfoImagen(archivo: File): Promise<InfoImagen> {
-  const formulario = new FormData();
-  formulario.append('archivo', archivo);
-
+/** Envía un formulario por POST y lanza un Error con un mensaje claro si algo falla. */
+async function enviarFormulario(ruta: string, formulario: FormData): Promise<Response> {
   let respuesta: Response;
   try {
-    respuesta = await fetch(`${URL_API}/api/imagen/info`, { method: 'POST', body: formulario });
+    respuesta = await fetch(`${URL_API}${ruta}`, { method: 'POST', body: formulario });
   } catch {
     throw new Error('No se pudo conectar con el servidor. Verifica que el backend esté en ejecución.');
   }
@@ -36,5 +31,45 @@ export async function obtenerInfoImagen(archivo: File): Promise<InfoImagen> {
   if (!respuesta.ok) {
     throw new Error(await leerMensajeError(respuesta));
   }
+  return respuesta;
+}
+
+/** Lee una cabecera numérica de la respuesta (por ejemplo X-Ancho). Devuelve null si falta o no es válida. */
+function leerNumero(respuesta: Response, cabecera: string): number | null {
+  const valor = Number(respuesta.headers.get(cabecera));
+  return Number.isFinite(valor) && valor > 0 ? valor : null;
+}
+
+/**
+ * Envía la imagen al backend y obtiene su resolución y las opciones de salida (HU-02).
+ * @param archivo Imagen seleccionada por el usuario.
+ */
+export async function obtenerInfoImagen(archivo: File): Promise<InfoImagen> {
+  if (USAR_SIMULADO) return apiSimulada.obtenerInfoImagen(archivo);
+
+  const formulario = new FormData();
+  formulario.append('archivo', archivo);
+  const respuesta = await enviarFormulario('/api/imagen/info', formulario);
   return respuesta.json();
+}
+
+/**
+ * Pide al backend la imagen reescalada a la resolución elegida (HU-05).
+ * @param archivo Imagen original.
+ * @param opcion Resolución de salida elegida por el usuario.
+ */
+export async function reescalarImagen(archivo: File, opcion: OpcionResolucion): Promise<ResultadoReescalado> {
+  if (USAR_SIMULADO) return apiSimulada.reescalarImagen(archivo, opcion);
+
+  const formulario = new FormData();
+  formulario.append('archivo', archivo);
+  formulario.append('resolucion', opcion.clave);
+  const respuesta = await enviarFormulario('/api/imagen/reescalar', formulario);
+  return {
+    imagen: await respuesta.blob(),
+    ancho: leerNumero(respuesta, 'X-Ancho') ?? opcion.ancho,
+    alto: leerNumero(respuesta, 'X-Alto') ?? opcion.alto,
+    metodo: respuesta.headers.get('X-Metodo'),
+    tiempoMs: leerNumero(respuesta, 'X-Tiempo-Ms'),
+  };
 }
