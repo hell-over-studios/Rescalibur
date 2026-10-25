@@ -8,7 +8,7 @@ from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import CABECERAS_EXPUESTAS, ORIGENES_PERMITIDOS
-from app.procesador import ImagenDemasiadoGrande, ImagenInvalidaError, ProcesadorImagen
+from app.procesador import ImagenDemasiadoGrandeError, ImagenInvalidaError, ProcesadorImagen
 from app.resoluciones import CalculadoraResolucion
 from app.servicio import ServicioReescalado
 
@@ -44,7 +44,7 @@ async def obtener_info_imagen(archivo: UploadFile = File(...)) -> dict:
     try:
         return servicio.obtener_info(contenido, archivo.filename or "")
     # Primero la excepción más específica: ambas heredan de ValueError.
-    except ImagenDemasiadoGrande as error:
+    except ImagenDemasiadoGrandeError as error:
         raise HTTPException(status_code=413, detail=str(error)) from error
     except ImagenInvalidaError as error:
         raise HTTPException(status_code=400, detail=str(error)) from error
