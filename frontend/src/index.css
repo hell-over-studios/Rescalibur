@@ -1,2 +1,27 @@
-/* Único archivo CSS del proyecto: solo carga Tailwind. Los estilos van como clases en los componentes. */
-@import "tailwindcss";
+/* Único archivo CSS del proyecto. Carga Tailwind, las tipografías y los tokens del diseño (Figma · «Rescalibur»).
+   Los estilos de cada componente van como clases en el propio componente. */
+@import 'tailwindcss';
+@import '@fontsource-variable/bricolage-grotesque';
+@import '@fontsource-variable/instrument-sans';
+
+/* Los nombres coinciden con las variables de Figma: color/suelo → bg-suelo, text-suelo, etc.
+   El diseño usa esquinas rectas y no usa sombras ni degradados. */
+@theme {
+  --color-suelo: #f2f4f5;
+  --color-superficie: #e3e8eb;
+  --color-superficie-honda: #cdd5da;
+  --color-tinta: #0d1b24;
+  --color-tinta-2: #44545e;
+  --color-acento: #ff5a1f;
+  --color-acento-hover: #e84a10;
+
+  --font-display: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+  --font-sans: 'Instrument Sans Variable', system-ui, sans-serif;
+}
+
+body {
+  min-height: 100svh;
+  background-color: var(--color-suelo);
+  color: var(--color-tinta);
+  -webkit-font-smoothing: antialiased;
+}
