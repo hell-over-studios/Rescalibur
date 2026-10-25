@@ -9,5 +9,5 @@ opencv-python-headless
 
 # Pruebas y estilo
 pytest
-httpx
+httpx2
 ruff
