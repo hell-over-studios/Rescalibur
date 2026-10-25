@@ -1,0 +1,13 @@
+# API
+fastapi
+uvicorn[standard]
+python-multipart
+
+# Cálculo numérico y lectura/escritura de imágenes
+numpy
+opencv-python-headless
+
+# Pruebas y estilo
+pytest
+httpx
+ruff
