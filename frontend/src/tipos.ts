@@ -18,3 +18,23 @@ export interface InfoImagen {
   alto: number;
   opciones: OpcionResolucion[];
 }
+
+/** Resultado de POST /api/imagen/reescalar: la imagen en PNG y los datos que envía la API en las cabeceras. */
+export interface ResultadoReescalado {
+  imagen: Blob;
+  ancho: number;
+  alto: number;
+  /** Cabecera X-Metodo. No se muestra en pantalla; queda disponible para las métricas del Sprint 2. */
+  metodo: string | null;
+  /** Cabecera X-Tiempo-Ms. No se muestra en pantalla; queda disponible para las métricas del Sprint 2. */
+  tiempoMs: number | null;
+}
+
+/** Mensaje de error listo para mostrar en el AvisoError. */
+export interface MensajeError {
+  titulo: string;
+  mensaje: string;
+}
+
+/** Paso actual del flujo: 1 cargar, 2 elegir resolución, 3 descargar. */
+export type Paso = 1 | 2 | 3;

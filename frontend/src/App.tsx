@@ -1,136 +1,146 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import Cabecera from './components/Cabecera';
 import CargadorImagen from './components/CargadorImagen';
-import SelectorResolucion from './components/SelectorResolucion';
-import { obtenerInfoImagen } from './services/api';
-import type { InfoImagen, OpcionResolucion } from './tipos';
+import ElegirResolucion from './components/ElegirResolucion';
+import Procesando from './components/Procesando';
+import ResultadoDescarga from './components/ResultadoDescarga';
+import { obtenerInfoImagen, reescalarImagen } from './services/api';
+import type { InfoImagen, MensajeError, OpcionResolucion, Paso, ResultadoReescalado } from './tipos';
+
+/** Etapas de la aplicación. Varias etapas comparten el mismo paso de la barra. */
+type Etapa = 'cargar' | 'leyendo' | 'elegir' | 'procesando' | 'listo';
+
+const PASO_DE_ETAPA: Record<Etapa, Paso> = {
+  cargar: 1,
+  leyendo: 1,
+  elegir: 2,
+  procesando: 3,
+  listo: 3,
+};
+
+/** Convierte cualquier error en un texto para el usuario. */
+function textoDeError(error: unknown): string {
+  return error instanceof Error ? error.message : 'Ocurrió un error inesperado.';
+}
 
 /**
  * Componente raíz: guarda el estado general y decide qué paso mostrar.
- * Paso 1: cargar (HU-01) → Paso 2: elegir resolución (HU-02) → Paso 3: descargar (HU-05, pendiente).
+ * Paso 1: cargar (HU-01) → Paso 2: elegir resolución (HU-02) → Paso 3: reescalar y descargar (HU-05).
+ * No hace cálculos: todo lo que se muestra viene de la API.
  */
 export default function App() {
+  const [etapa, setEtapa] = useState<Etapa>('cargar');
   const [archivo, setArchivo] = useState<File | null>(null);
   const [urlVistaPrevia, setUrlVistaPrevia] = useState<string | null>(null);
   const [infoImagen, setInfoImagen] = useState<InfoImagen | null>(null);
   const [claveResolucion, setClaveResolucion] = useState<OpcionResolucion['clave'] | null>(null);
-  const [cargando, setCargando] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [vistaPreviaFallo, setVistaPreviaFallo] = useState(false);
+  const [resultado, setResultado] = useState<ResultadoReescalado | null>(null);
+  const [urlResultado, setUrlResultado] = useState<string | null>(null);
+  const [error, setError] = useState<MensajeError | null>(null);
 
-  // Libera la URL temporal de la vista previa cuando cambia la imagen, para no gastar memoria.
+  // Cada petición recibe un número. Si el usuario reinicia mientras el servidor responde, la respuesta vieja se ignora.
+  const numeroPeticion = useRef(0);
+
+  // Libera las URL temporales cuando cambian o al cerrar la página, para no gastar memoria.
   useEffect(() => {
     return () => {
       if (urlVistaPrevia) URL.revokeObjectURL(urlVistaPrevia);
     };
   }, [urlVistaPrevia]);
 
+  useEffect(() => {
+    return () => {
+      if (urlResultado) URL.revokeObjectURL(urlResultado);
+    };
+  }, [urlResultado]);
+
   const manejarArchivo = async (nuevoArchivo: File) => {
-    setArchivo(nuevoArchivo);
-    setUrlVistaPrevia(URL.createObjectURL(nuevoArchivo));
-    setVistaPreviaFallo(false);
-    setInfoImagen(null);
-    setClaveResolucion(null);
+    const peticion = ++numeroPeticion.current;
     setError(null);
-    setCargando(true);
+    setEtapa('leyendo');
     try {
       const info = await obtenerInfoImagen(nuevoArchivo);
+      if (peticion !== numeroPeticion.current) return;
+      setArchivo(nuevoArchivo);
       setInfoImagen(info);
+      setUrlVistaPrevia(URL.createObjectURL(nuevoArchivo));
       // Se preselecciona la primera opción disponible.
       setClaveResolucion(info.opciones[0]?.clave ?? null);
+      setEtapa('elegir');
     } catch (errorApi) {
-      setError(errorApi instanceof Error ? errorApi.message : 'Ocurrió un error inesperado.');
-    } finally {
-      setCargando(false);
+      if (peticion !== numeroPeticion.current) return;
+      setError({ titulo: `No pudimos cargar «${nuevoArchivo.name}»`, mensaje: textoDeError(errorApi) });
+      setEtapa('cargar');
+    }
+  };
+
+  const manejarReescalar = async (opcion: OpcionResolucion) => {
+    if (!archivo) return;
+    const peticion = ++numeroPeticion.current;
+    setError(null);
+    setClaveResolucion(opcion.clave);
+    setEtapa('procesando');
+    try {
+      const respuesta = await reescalarImagen(archivo, opcion);
+      if (peticion !== numeroPeticion.current) return;
+      setResultado(respuesta);
+      setUrlResultado(URL.createObjectURL(respuesta.imagen));
+      setEtapa('listo');
+    } catch (errorApi) {
+      if (peticion !== numeroPeticion.current) return;
+      setError({ titulo: 'No pudimos reescalar tu imagen', mensaje: textoDeError(errorApi) });
+      setEtapa('elegir');
     }
   };
 
   const manejarReinicio = () => {
+    numeroPeticion.current += 1;
+    setEtapa('cargar');
     setArchivo(null);
     setUrlVistaPrevia(null);
     setInfoImagen(null);
     setClaveResolucion(null);
+    setResultado(null);
+    setUrlResultado(null);
     setError(null);
   };
 
   const opcionElegida = infoImagen?.opciones.find((opcion) => opcion.clave === claveResolucion);
 
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-900">
-      <header className="border-b border-slate-200 bg-white px-4 py-3 md:px-8">
-        <h1 className="text-xl font-bold text-indigo-700">
-          Rescalibur
-          <span className="ml-2 text-sm font-normal text-slate-700">Reescalador por métodos numéricos</span>
-        </h1>
-      </header>
+    <div className="mx-auto flex w-full max-w-[860px] flex-col gap-6 px-4 pt-6 pb-10 md:gap-10 md:px-6 md:pt-10 md:pb-24">
+      <Cabecera paso={PASO_DE_ETAPA[etapa]} />
 
-      <main className="mx-auto max-w-4xl px-4 py-6">
-        {!archivo && <CargadorImagen alSeleccionarArchivo={manejarArchivo} deshabilitado={cargando} />}
+      {(etapa === 'cargar' || etapa === 'leyendo') && (
+        <CargadorImagen alSeleccionarArchivo={manejarArchivo} deshabilitado={etapa === 'leyendo'} error={error} />
+      )}
 
-        {archivo && (
-          <section className="rounded-2xl border border-slate-200 bg-white p-4 md:p-6">
-            <h2 className="text-lg font-bold">Elige la resolución de salida</h2>
-            <p className="mb-4 text-sm text-slate-500">
-              Solo se muestran las resoluciones mayores que la de tu imagen. Se conserva la proporción.
-            </p>
+      {etapa === 'elegir' && infoImagen && urlVistaPrevia && (
+        <ElegirResolucion
+          infoImagen={infoImagen}
+          urlVistaPrevia={urlVistaPrevia}
+          claveSeleccionada={claveResolucion}
+          alSeleccionar={setClaveResolucion}
+          error={error}
+          alReescalar={manejarReescalar}
+          alCambiarImagen={manejarReinicio}
+        />
+      )}
 
-            <div className="flex flex-col gap-6 md:flex-row">
-              <div className="md:w-64">
-                {/* Algunos navegadores no muestran TIFF; en ese caso se oculta la vista previa. */}
-                {urlVistaPrevia && !vistaPreviaFallo && (
-                  <img
-                    src={urlVistaPrevia}
-                    alt={`Vista previa de ${archivo.name}`}
-                    onError={() => setVistaPreviaFallo(true)}
-                    className="h-auto max-w-full rounded-lg border border-slate-200"
-                  />
-                )}
-                <p className="mt-2 text-sm font-bold break-all">{archivo.name}</p>
-                {infoImagen && (
-                  <p className="text-sm">
-                    Resolución actual: <strong>{infoImagen.ancho} × {infoImagen.alto} px</strong>
-                  </p>
-                )}
-              </div>
+      {etapa === 'procesando' && infoImagen && opcionElegida && urlVistaPrevia && (
+        <Procesando infoImagen={infoImagen} opcion={opcionElegida} urlVistaPrevia={urlVistaPrevia} />
+      )}
 
-              <div className="flex-1">
-                {cargando && <p className="text-sm text-slate-500">Analizando la imagen…</p>}
-
-                {error && (
-                  <p role="alert" className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-                    {error}
-                  </p>
-                )}
-
-                {infoImagen && (
-                  <SelectorResolucion
-                    opciones={infoImagen.opciones}
-                    claveSeleccionada={claveResolucion}
-                    alSeleccionar={setClaveResolucion}
-                  />
-                )}
-
-                <div className="mt-6 flex flex-col gap-3 md:flex-row">
-                  {/* El reescalado se conecta en HU-05 (T13 y T14). */}
-                  <button
-                    type="button"
-                    disabled={!opcionElegida}
-                    className="rounded-lg bg-indigo-700 px-5 py-3 font-bold text-white disabled:opacity-50"
-                  >
-                    {opcionElegida ? `Reescalar a ${opcionElegida.nombre}` : 'Reescalar'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={manejarReinicio}
-                    className="rounded-lg border border-indigo-200 bg-white px-5 py-3 font-bold text-indigo-700"
-                  >
-                    Cambiar imagen
-                  </button>
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
-      </main>
+      {etapa === 'listo' && infoImagen && opcionElegida && resultado && urlVistaPrevia && urlResultado && (
+        <ResultadoDescarga
+          infoImagen={infoImagen}
+          opcion={opcionElegida}
+          resultado={resultado}
+          urlVistaPrevia={urlVistaPrevia}
+          urlResultado={urlResultado}
+          alOtraImagen={manejarReinicio}
+        />
+      )}
     </div>
   );
 }
