@@ -6,8 +6,8 @@ import pytest
 
 from app.procesador import (
     TAMANO_MAXIMO_MB,
-    ImagenDemasiadoGrande,
-    ImagenInvalida,
+    ImagenDemasiadoGrandeError,
+    ImagenInvalidaError,
     ProcesadorImagen,
 )
 from app.resoluciones import CalculadoraResolucion
@@ -46,17 +46,17 @@ def test_normaliza_16_bits_a_8_bits():
 
 
 def test_cp02_archivo_que_no_es_imagen():
-    with pytest.raises(ImagenInvalida):
+    with pytest.raises(ImagenInvalidaError):
         procesador.leer(b"esto es un texto, no una imagen")
 
 
 def test_archivo_vacio():
-    with pytest.raises(ImagenInvalida):
+    with pytest.raises(ImagenInvalidaError):
         procesador.leer(b"")
 
 
 def test_cp03_archivo_demasiado_grande():
-    with pytest.raises(ImagenDemasiadoGrande):
+    with pytest.raises(ImagenDemasiadoGrandeError):
         procesador.leer(b"0" * (TAMANO_MAXIMO_MB * 1024 * 1024 + 1))
 
 
@@ -73,5 +73,5 @@ def test_cp01_y_cp04_obtener_info():
 
 
 def test_extension_no_aceptada():
-    with pytest.raises(ImagenInvalida):
+    with pytest.raises(ImagenInvalidaError):
         servicio.obtener_info(a_bytes(np.zeros((10, 10, 3), np.uint8)), "documento.txt")

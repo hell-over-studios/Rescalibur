@@ -13,11 +13,11 @@ FORMATOS_ACEPTADOS = (".jpg", ".jpeg", ".png", ".bmp", ".webp", ".tif", ".tiff")
 NIVELES_16_A_8_BITS = 257  # 65535 / 255: lleva el rango 0..65535 a 0..255
 
 
-class ImagenInvalida(ValueError):
+class ImagenInvalidaError(ValueError):
     """El archivo no es una imagen que se pueda leer (la API responde 400)."""
 
 
-class ImagenDemasiadoGrande(ValueError):
+class ImagenDemasiadoGrandeError(ValueError):
     """El archivo supera TAMANO_MAXIMO_MB (la API responde 413)."""
 
 
@@ -35,7 +35,7 @@ class ProcesadorImagen:
         # IMREAD_UNCHANGED conserva el canal alfa y la escala de grises.
         matriz = cv2.imdecode(datos, cv2.IMREAD_UNCHANGED)
         if matriz is None:
-            raise ImagenInvalida("El archivo no es una imagen válida")
+            raise ImagenInvalidaError("El archivo no es una imagen válida")
         return self._a_8_bits(matriz)
 
     def codificar_png(self, matriz: np.ndarray) -> bytes:
@@ -47,9 +47,9 @@ class ProcesadorImagen:
 
     def _validar_tamano(self, contenido: bytes) -> None:
         if len(contenido) > TAMANO_MAXIMO_MB * BYTES_POR_MB:
-            raise ImagenDemasiadoGrande(f"La imagen supera el máximo de {TAMANO_MAXIMO_MB} MB")
+            raise ImagenDemasiadoGrandeError(f"La imagen supera el máximo de {TAMANO_MAXIMO_MB} MB")
         if len(contenido) == 0:
-            raise ImagenInvalida("El archivo está vacío")
+            raise ImagenInvalidaError("El archivo está vacío")
 
     @staticmethod
     def _a_8_bits(matriz: np.ndarray) -> np.ndarray:

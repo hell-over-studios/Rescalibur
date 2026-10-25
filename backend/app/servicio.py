@@ -4,7 +4,7 @@ Por ahora solo tiene obtener_info (HU-01 y HU-02). El método reescalar()
 y el atributo metodo se agregan en la HU-05, junto con la configuración de la HU-06.
 """
 
-from app.procesador import FORMATOS_ACEPTADOS, ImagenInvalida, ProcesadorImagen
+from app.procesador import FORMATOS_ACEPTADOS, ImagenInvalidaError, ProcesadorImagen
 from app.resoluciones import CalculadoraResolucion
 
 
@@ -18,10 +18,12 @@ class ServicioReescalado:
     def obtener_info(self, contenido: bytes, nombre: str) -> dict:
         """Lee la imagen y devuelve sus datos con las resoluciones disponibles.
 
-        Lanza ImagenInvalida o ImagenDemasiadoGrande; la API las convierte en 400 / 413.
+           Lanza ImagenInvalidaError
+        o ImagenDemasiadoGrandeError; la API las convierte en 400 / 413.
         """
         if not nombre.lower().endswith(FORMATOS_ACEPTADOS):
-            raise ImagenInvalida("Formato no aceptado. Usa JPG, PNG, BMP, WEBP o TIFF")
+            raise ImagenInvalidaError
+        ("Formato no aceptado. Usa JPG, PNG, BMP, WEBP o TIFF")
         matriz = self.procesador.leer(contenido)
         alto, ancho = matriz.shape[:2]
         opciones = self.calculadora.opciones_disponibles(ancho, alto)
