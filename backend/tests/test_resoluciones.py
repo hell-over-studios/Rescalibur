@@ -1,58 +1,77 @@
-"""Pruebas unitarias de CalculadoraResolucion (HU-02, casos CP-04 a CP-07)."""
+"""Pruebas de ProcesadorImagen y ServicioReescalado.obtener_info (HU-01, CP-01 a CP-04)."""
 
+import cv2
+import numpy as np
 import pytest
 
+from app.procesador import (
+    TAMANO_MAXIMO_MB,
+    ImagenDemasiadoGrande,
+    ImagenInvalida,
+    ProcesadorImagen,
+)
 from app.resoluciones import CalculadoraResolucion
+from app.servicio import ServicioReescalado
 
-calculadora = CalculadoraResolucion()
-
-
-def resumen(ancho: int, alto: int) -> dict[str, tuple[int, int]]:
-    """Convierte las opciones en {clave: (ancho, alto)} para comparar fácil."""
-    return {o.clave: (o.ancho, o.alto) for o in calculadora.opciones_disponibles(ancho, alto)}
+procesador = ProcesadorImagen()
+servicio = ServicioReescalado(procesador, CalculadoraResolucion())
 
 
-def test_cp04_todas_las_opciones():
-    assert resumen(800, 600) == {
-        "hd": (960, 720),
-        "fullhd": (1440, 1080),
-        "2k": (1920, 1440),
-        "4k": (2880, 2160),
-    }
+def a_bytes(matriz: np.ndarray, extension: str = ".png") -> bytes:
+    """Codifica una matriz como si fuera un archivo subido por el usuario."""
+    _, buffer = cv2.imencode(extension, matriz)
+    return buffer.tobytes()
 
 
-def test_cp05_opciones_parciales():
-    # Full HD exacto: s = 1 en HD y Full HD, por eso no se ofrecen.
-    assert resumen(1920, 1080) == {"2k": (2560, 1440), "4k": (3840, 2160)}
+def test_lee_imagen_a_color():
+    matriz = procesador.leer(a_bytes(np.zeros((600, 800, 3), np.uint8), ".jpg"))
+    assert matriz.shape == (600, 800, 3)
 
 
-def test_cp06_imagen_vertical_gira_el_marco():
-    assert resumen(1080, 1920) == {"2k": (1440, 2560), "4k": (2160, 3840)}
+def test_conserva_canal_alfa():
+    matriz = procesador.leer(a_bytes(np.zeros((10, 20, 4), np.uint8)))
+    assert matriz.shape == (10, 20, 4)
 
 
-def test_cp07_sin_opciones():
-    assert resumen(4000, 3000) == {}
+def test_conserva_escala_de_grises():
+    matriz = procesador.leer(a_bytes(np.zeros((10, 20), np.uint8)))
+    assert matriz.shape == (10, 20)
 
 
-def test_imagen_cuadrada_usa_marco_horizontal():
-    # 500 x 500 en HD: s = min(1280/500, 720/500) = 1.44 -> 720 x 720
-    assert resumen(500, 500)["hd"] == (720, 720)
+def test_normaliza_16_bits_a_8_bits():
+    original = np.full((4, 4, 3), 65535, np.uint16)
+    matriz = procesador.leer(a_bytes(original))
+    assert matriz.dtype == np.uint8
+    assert matriz.max() == 255
 
 
-def test_se_conserva_la_proporcion():
-    for opcion in calculadora.opciones_disponibles(1000, 750):
-        assert abs(opcion.ancho / opcion.alto - 1000 / 750) < 0.01
+def test_cp02_archivo_que_no_es_imagen():
+    with pytest.raises(ImagenInvalida):
+        procesador.leer(b"esto es un texto, no una imagen")
 
 
-def test_calcular_dimensiones_de_una_clave():
-    assert calculadora.calcular_dimensiones(800, 600, "fullhd") == (1440, 1080)
+def test_archivo_vacio():
+    with pytest.raises(ImagenInvalida):
+        procesador.leer(b"")
 
 
-def test_clave_desconocida_lanza_error():
-    with pytest.raises(ValueError):
-        calculadora.calcular_dimensiones(800, 600, "8k")
+def test_cp03_archivo_demasiado_grande():
+    with pytest.raises(ImagenDemasiadoGrande):
+        procesador.leer(b"0" * (TAMANO_MAXIMO_MB * 1024 * 1024 + 1))
 
 
-def test_clave_no_disponible_lanza_error():
-    with pytest.raises(ValueError):
-        calculadora.calcular_dimensiones(1920, 1080, "hd")
+def test_codificar_png_ida_y_vuelta():
+    original = np.random.randint(0, 256, (5, 7, 3), np.uint8)
+    recuperada = procesador.leer(procesador.codificar_png(original))
+    assert np.array_equal(original, recuperada)
+
+
+def test_cp01_y_cp04_obtener_info():
+    info = servicio.obtener_info(a_bytes(np.zeros((600, 800, 3), np.uint8)), "paisaje.png")
+    assert (info["nombre"], info["ancho"], info["alto"]) == ("paisaje.png", 800, 600)
+    assert info["opciones"][1] == {"clave": "fullhd", "nombre": "Full HD", "ancho": 1440, "alto": 1080}
+
+
+def test_extension_no_aceptada():
+    with pytest.raises(ImagenInvalida):
+        servicio.obtener_info(a_bytes(np.zeros((10, 10, 3), np.uint8)), "documento.txt")
