@@ -21,9 +21,7 @@ class VecinoMasCercano(MetodoInterpolacion):
 
     nombre = "vecino"
 
-    def reescalar(
-        self, matriz: np.ndarray, nuevo_ancho: int, nuevo_alto: int
-    ) -> np.ndarray:
+    def reescalar(self, matriz: np.ndarray, nuevo_ancho: int, nuevo_alto: int) -> np.ndarray:
         """Reescala la imagen a nuevo_ancho × nuevo_alto con el vecino más cercano.
 
         Funciona igual en gris (h, w), color (h, w, 3) y con alfa (h, w, 4):

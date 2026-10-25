@@ -19,9 +19,7 @@ class MetodoInterpolacion(ABC):
     nombre: str = ""
 
     @abstractmethod
-    def reescalar(
-        self, matriz: np.ndarray, nuevo_ancho: int, nuevo_alto: int
-    ) -> np.ndarray:
+    def reescalar(self, matriz: np.ndarray, nuevo_ancho: int, nuevo_alto: int) -> np.ndarray:
         """Devuelve una matriz nueva de nuevo_alto × nuevo_ancho con los mismos canales.
 
         Args:
@@ -30,9 +28,7 @@ class MetodoInterpolacion(ABC):
             nuevo_alto: alto final H calculado en HU-02.
         """
 
-    def validar_entrada(
-        self, matriz: np.ndarray, nuevo_ancho: int, nuevo_alto: int
-    ) -> None:
+    def validar_entrada(self, matriz: np.ndarray, nuevo_ancho: int, nuevo_alto: int) -> None:
         """Revisa la matriz y las dimensiones antes de interpolar.
 
         Lanza ValueError (o TypeError) con un mensaje claro si algo no cumple.
@@ -41,9 +37,7 @@ class MetodoInterpolacion(ABC):
             raise TypeError("La imagen debe ser un arreglo de NumPy.")
 
         if matriz.ndim not in (2, 3):
-            raise ValueError(
-                f"La imagen debe tener 2 o 3 dimensiones, tiene {matriz.ndim}."
-            )
+            raise ValueError(f"La imagen debe tener 2 o 3 dimensiones, tiene {matriz.ndim}.")
 
         if matriz.ndim == 3 and matriz.shape[2] not in CANALES_VALIDOS:
             raise ValueError(f"Número de canales no soportado: {matriz.shape[2]}.")
