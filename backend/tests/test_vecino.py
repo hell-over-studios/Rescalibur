@@ -1,5 +1,6 @@
 import ast
 import inspect
+
 import cv2
 import numpy as np
 import pytest
@@ -7,7 +8,7 @@ import pytest
 from app.metodos import vecino as modulo_vecino
 from app.metodos.vecino import VecinoMasCercano
 
-SEMILLA = 2026  
+SEMILLA = 2026
 metodo = VecinoMasCercano()
 
 
@@ -15,6 +16,7 @@ def imagen_aleatoria(alto: int, ancho: int, canales: int | None = None) -> np.nd
     generador = np.random.default_rng(SEMILLA)
     forma = (alto, ancho) if canales is None else (alto, ancho, canales)
     return generador.integers(0, 256, size=forma, dtype=np.uint8)
+
 
 def test_cp08_matriz_2x2_a_4x4():
 
@@ -65,6 +67,7 @@ def test_un_solo_pixel_se_copia_en_toda_la_imagen():
 
     assert resultado.tolist() == [[7, 7, 7], [7, 7, 7]]
 
+
 @pytest.mark.parametrize(
     ("destino", "origen", "esperado"),
     [
@@ -106,21 +109,23 @@ def test_el_minimo_de_proteccion_es_solo_una_red_de_seguridad():
             sin_minimo = (2 * k + 1) * origen // (2 * destino)
             assert sin_minimo.max() <= origen - 1, (destino, origen)
 
+
 @pytest.mark.parametrize(
     ("ancho", "alto", "nuevo_ancho", "nuevo_alto"),
     [
-        (800, 600, 2880, 2160),  
-        (800, 600, 960, 720),  
-        (1080, 1920, 2160, 3840),  
-        (1920, 1080, 2560, 1440),  
+        (800, 600, 2880, 2160),
+        (800, 600, 960, 720),
+        (1080, 1920, 2160, 3840),
+        (1920, 1080, 2560, 1440),
         (1, 1, 5, 7),
-        (3, 2, 3, 2),  
+        (3, 2, 3, 2),
     ],
 )
 def test_la_imagen_resultante_tiene_exactamente_las_dimensiones_pedidas(ancho, alto, nuevo_ancho, nuevo_alto):
     resultado = metodo.reescalar(imagen_aleatoria(alto, ancho, 3), nuevo_ancho, nuevo_alto)
 
     assert resultado.shape == (nuevo_alto, nuevo_ancho, 3)
+
 
 @pytest.mark.parametrize(("factor_x", "factor_y"), [(2, 2), (3, 3), (4, 4), (2, 3), (5, 1)])
 def test_ampliacion_entera_convierte_cada_pixel_en_un_bloque(factor_x, factor_y):
@@ -171,7 +176,7 @@ def test_no_modifica_la_imagen_original_y_devuelve_una_copia():
     copia_de_seguridad = original.copy()
 
     resultado = metodo.reescalar(original, 8, 8)
-    resultado[:] = 0  
+    resultado[:] = 0
 
     assert np.array_equal(original, copia_de_seguridad)
     assert not np.shares_memory(resultado, original)
@@ -195,6 +200,7 @@ def test_ancho_y_alto_no_se_confunden_en_imagen_no_cuadrada():
     assert resultado[0].tolist() == [0, 0, 1, 1, 2, 2]
     assert resultado[3].tolist() == [3, 3, 4, 4, 5, 5]
 
+
 def referencia_opencv(imagen: np.ndarray, nuevo_ancho: int, nuevo_alto: int) -> np.ndarray:
     """cv2.resize recibe el tamaño como (ancho, alto), al revés que la forma de NumPy."""
     return cv2.resize(imagen, (nuevo_ancho, nuevo_alto), interpolation=cv2.INTER_NEAREST_EXACT)
@@ -211,10 +217,10 @@ def test_cp09_identica_a_opencv_800x600_a_4k():
 @pytest.mark.parametrize(
     ("ancho", "alto", "nuevo_ancho", "nuevo_alto"),
     [
-        (7, 5, 11, 13), 
-        (13, 11, 7, 5), 
-        (1920, 1080, 2560, 1440),  
-        (1080, 1920, 1440, 2560),  
+        (7, 5, 11, 13),
+        (13, 11, 7, 5),
+        (1920, 1080, 2560, 1440),
+        (1080, 1920, 1440, 2560),
     ],
 )
 def test_coincide_con_opencv_en_otras_razones(ancho, alto, nuevo_ancho, nuevo_alto):
@@ -223,6 +229,7 @@ def test_coincide_con_opencv_en_otras_razones(ancho, alto, nuevo_ancho, nuevo_al
     resultado = metodo.reescalar(original, nuevo_ancho, nuevo_alto)
 
     assert np.array_equal(resultado, referencia_opencv(original, nuevo_ancho, nuevo_alto))
+
 
 @pytest.mark.parametrize(
     ("canales", "forma_esperada"), [(None, (12, 15)), (1, (12, 15, 1)), (3, (12, 15, 3)), (4, (12, 15, 4))]
@@ -252,7 +259,7 @@ def test_cp12_conserva_la_transparencia():
     resultado = metodo.reescalar(original, nuevo_ancho=8, nuevo_alto=4)
 
     alfa = resultado[:, :, 3]
-    assert set(np.unique(alfa)) == {0, 255} 
+    assert set(np.unique(alfa)) == {0, 255}
     assert np.all(alfa[:, :4] == 0)
     assert np.all(alfa[:, 4:] == 255)
 
@@ -264,9 +271,11 @@ def test_conserva_los_valores_extremos_0_y_255():
 
     assert resultado.tolist() == [[0, 0, 255, 255]]
 
+
 def test_rechaza_algo_que_no_es_un_arreglo_de_numpy():
     with pytest.raises(TypeError, match="NumPy"):
         metodo.reescalar([[1, 2], [3, 4]], 4, 4)
+
 
 @pytest.mark.parametrize("forma", [(5,), (2, 2, 3, 1)])
 def test_rechaza_dimensiones_que_no_son_2_ni_3(forma):
@@ -309,6 +318,7 @@ def test_acepta_enteros_de_numpy_como_dimension_destino():
     resultado = metodo.reescalar(imagen, np.int64(4), np.int32(6))
 
     assert resultado.shape == (6, 4)
+
 
 def test_el_vecino_no_usa_opencv():
     arbol = ast.parse(inspect.getsource(modulo_vecino))
