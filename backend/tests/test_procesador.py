@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 import pytest
 
+from app.metodos.bilineal import Bilineal
 from app.procesador import (
     TAMANO_MAXIMO_MB,
     ImagenDemasiadoGrandeError,
@@ -14,7 +15,7 @@ from app.resoluciones import CalculadoraResolucion
 from app.servicio import ServicioReescalado
 
 procesador = ProcesadorImagen()
-servicio = ServicioReescalado(procesador, CalculadoraResolucion())
+servicio = ServicioReescalado(procesador, CalculadoraResolucion(), Bilineal())
 
 
 def a_bytes(matriz: np.ndarray, extension: str = ".png") -> bytes:
