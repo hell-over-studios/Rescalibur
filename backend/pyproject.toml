@@ -1,0 +1,12 @@
+[tool.pytest.ini_options]
+# Permite que las pruebas importen "app" al ejecutar pytest desde backend/.
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "UP"]
+ 

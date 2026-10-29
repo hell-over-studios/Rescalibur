@@ -1,28 +1,33 @@
-# Dependencias
-node_modules/
-
-# Construcción de producción
-dist/
-dist-ssr/
-
-# Archivos de entorno local (variables secretas, si las hay)
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Archivos de log
+# Logs
+logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+lerna-debug.log*
 
-# Imágenes de prueba pesadas (Agrega esto por precaución)
-*.jpg
-*.jpeg
-*.png
-# Excepto las de la carpeta public o assets si son iconos necesarios
-!src/assets/*.png
-!src/assets/*.svg
-!public/*.svg
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Variables de entorno
+.env
+.env.development
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
