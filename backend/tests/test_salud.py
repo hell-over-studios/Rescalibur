@@ -2,6 +2,7 @@
 
 from fastapi.testclient import TestClient
 
+from app.config import METODO_ACTIVO
 from app.main import app
 
 cliente = TestClient(app)
@@ -12,7 +13,7 @@ def test_salud_responde_ok():
     respuesta = cliente.get("/api/salud")
 
     assert respuesta.status_code == 200
-    assert respuesta.json() == {"estado": "ok"}
+    assert respuesta.json() == {"estado": "ok", "metodo": METODO_ACTIVO}
 
 
 def test_cors_permite_al_frontend():

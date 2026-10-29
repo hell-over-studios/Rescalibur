@@ -8,6 +8,7 @@ import cv2
 import numpy as np
 from fastapi.testclient import TestClient
 
+from app.config import METODO_ACTIVO
 from app.main import app
 
 cliente = TestClient(app)
@@ -52,7 +53,7 @@ def test_cabeceras_del_contrato():
 
     assert respuesta.headers["x-ancho"] == "960"
     assert respuesta.headers["x-alto"] == "720"
-    assert respuesta.headers["x-metodo"] == "bilineal"
+    assert respuesta.headers["x-metodo"] == METODO_ACTIVO
     assert float(respuesta.headers["x-tiempo-ms"]) >= 0
 
 
