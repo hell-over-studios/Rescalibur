@@ -2,9 +2,8 @@
  * Único módulo que se comunica con el backend.
  * Los componentes nunca llaman a fetch directamente.
  */
-import { URL_API, USAR_SIMULADO } from '../constantes';
+import { URL_API } from '../constantes';
 import type { InfoImagen, OpcionResolucion, ResultadoReescalado } from '../tipos';
-import * as apiSimulada from './apiSimulada';
 
 /**
  * Lee el mensaje de error que envía FastAPI ({"detail": "..."}).
@@ -45,8 +44,6 @@ function leerNumero(respuesta: Response, cabecera: string): number | null {
  * @param archivo Imagen seleccionada por el usuario.
  */
 export async function obtenerInfoImagen(archivo: File): Promise<InfoImagen> {
-  if (USAR_SIMULADO) return apiSimulada.obtenerInfoImagen(archivo);
-
   const formulario = new FormData();
   formulario.append('archivo', archivo);
   const respuesta = await enviarFormulario('/api/imagen/info', formulario);
@@ -59,8 +56,6 @@ export async function obtenerInfoImagen(archivo: File): Promise<InfoImagen> {
  * @param opcion Resolución de salida elegida por el usuario.
  */
 export async function reescalarImagen(archivo: File, opcion: OpcionResolucion): Promise<ResultadoReescalado> {
-  if (USAR_SIMULADO) return apiSimulada.reescalarImagen(archivo, opcion);
-
   const formulario = new FormData();
   formulario.append('archivo', archivo);
   formulario.append('resolucion', opcion.clave);
