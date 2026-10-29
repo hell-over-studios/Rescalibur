@@ -1,8 +1,8 @@
 """Orquestación del proceso: leer -> calcular -> reescalar -> codificar (sección 5.2).
 
 ServicioReescalado no sabe qué método de interpolación usa: lo recibe en el
-constructor (patrón Estrategia). En la HU-06, main.py lo elegirá con
-obtener_metodo() a partir de METODO_ACTIVO.
+constructor (patrón Estrategia). main.py se lo entrega con obtener_metodo(),
+a partir de METODO_ACTIVO en config.py (HU-06).
 """
 
 import time

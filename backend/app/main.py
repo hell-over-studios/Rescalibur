@@ -7,8 +7,7 @@ Ejecutar desde la carpeta backend/:
 from fastapi import FastAPI, File, Form, HTTPException, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.config import CABECERAS_EXPUESTAS, ORIGENES_PERMITIDOS
-from app.metodos.bilineal import Bilineal
+from app.config import CABECERAS_EXPUESTAS, ORIGENES_PERMITIDOS, obtener_metodo
 from app.procesador import ImagenDemasiadoGrandeError, ImagenInvalidaError, ProcesadorImagen
 from app.resoluciones import CalculadoraResolucion
 from app.servicio import ServicioReescalado
@@ -29,14 +28,15 @@ app.add_middleware(
 )
 
 # Una sola instancia: no guarda estado entre peticiones, solo agrupa las clases.
-# El método queda fijo en Bilineal hasta la HU-06, que lo elige con obtener_metodo().
-servicio = ServicioReescalado(ProcesadorImagen(), CalculadoraResolucion(), Bilineal())
+# El método sale de METODO_ACTIVO en config.py (HU-06). Se lee una vez, al arrancar:
+# por eso hay que reiniciar el servidor tras cambiarlo. Un nombre inválido detiene el arranque.
+servicio = ServicioReescalado(ProcesadorImagen(), CalculadoraResolucion(), obtener_metodo())
 
 
 @app.get("/api/salud")
 def verificar_salud() -> dict[str, str]:
-    """Indica que el servidor está en ejecución. Sirve para comprobar la conexión."""
-    return {"estado": "ok"}
+    """Indica que el servidor está en ejecución y con qué método reescala (HU-00 y HU-06)."""
+    return {"estado": "ok", "metodo": servicio.metodo.nombre}
 
 
 @app.post("/api/imagen/info")
