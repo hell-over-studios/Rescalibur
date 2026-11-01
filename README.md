@@ -1,4 +1,4 @@
-# Rescalibur
+# rescalibur
 
 **Reescalador de imágenes web por métodos numéricos**
 
