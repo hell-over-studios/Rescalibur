@@ -1,4 +1,4 @@
-"""Pruebas de HU-06 y HU-08: METODO_ACTIVO, obtener_metodo(), CP-14 y CP-23.
+"""Pruebas de HU-06: METODO_ACTIVO, obtener_metodo() y CP-14.
 
 CP-14 pide cambiar METODO_ACTIVO y reiniciar el servidor. Aquí se simula así:
 se cambia el valor con monkeypatch y se vuelve a cargar app.main con
@@ -16,11 +16,10 @@ import app.main
 from app import config
 from app.config import METODOS_DISPONIBLES, obtener_metodo
 from app.metodos.base import MetodoInterpolacion
-from app.metodos.bicubico import Bicubico
 from app.metodos.bilineal import Bilineal
 from app.metodos.vecino import VecinoMasCercano
 
-METODOS_PROGRAMADOS = [("vecino", VecinoMasCercano), ("bilineal", Bilineal), ("bicubico", Bicubico)]
+METODOS_DEL_SPRINT = [("vecino", VecinoMasCercano), ("bilineal", Bilineal)]
 
 
 def a_png(matriz: np.ndarray) -> bytes:
@@ -59,7 +58,7 @@ def test_metodo_activo_del_repositorio_es_valido():
     assert config.METODO_ACTIVO in METODOS_DISPONIBLES
 
 
-@pytest.mark.parametrize(("nombre", "clase"), METODOS_PROGRAMADOS)
+@pytest.mark.parametrize(("nombre", "clase"), METODOS_DEL_SPRINT)
 def test_obtener_metodo_devuelve_la_clase_indicada(monkeypatch, nombre, clase):
     monkeypatch.setattr(config, "METODO_ACTIVO", nombre)
 
@@ -76,8 +75,7 @@ def test_claves_coinciden_con_el_nombre_de_cada_clase():
         assert clase.nombre == clave
 
 
-# "lanczos" es un método real que Rescalibur no programa; los demás son errores de escritura.
-@pytest.mark.parametrize("nombre", ["lanczos", "Bicubico", "vecino ", ""])
+@pytest.mark.parametrize("nombre", ["bicubico", "Bilineal", "vecino ", ""])
 def test_nombre_invalido_lanza_error_con_mensaje_claro(monkeypatch, nombre):
     monkeypatch.setattr(config, "METODO_ACTIVO", nombre)
 
@@ -86,7 +84,7 @@ def test_nombre_invalido_lanza_error_con_mensaje_claro(monkeypatch, nombre):
 
     mensaje = str(error.value)
     assert f'"{nombre}"' in mensaje
-    assert '"vecino"' in mensaje and '"bilineal"' in mensaje and '"bicubico"' in mensaje
+    assert '"vecino"' in mensaje and '"bilineal"' in mensaje
 
 
 # --- Arranque de la API ---
@@ -94,10 +92,10 @@ def test_nombre_invalido_lanza_error_con_mensaje_claro(monkeypatch, nombre):
 
 def test_metodo_invalido_detiene_el_arranque(arrancar_con):
     with pytest.raises(ValueError, match="no es un método válido"):
-        arrancar_con("lanczos")
+        arrancar_con("bicubico")
 
 
-@pytest.mark.parametrize(("nombre", "_clase"), METODOS_PROGRAMADOS)
+@pytest.mark.parametrize(("nombre", "_clase"), METODOS_DEL_SPRINT)
 def test_salud_informa_el_metodo_activo(arrancar_con, nombre, _clase):
     cliente = arrancar_con(nombre)
 
@@ -110,7 +108,7 @@ def test_salud_informa_el_metodo_activo(arrancar_con, nombre, _clase):
 def test_cp14_x_metodo_cambia_segun_metodo_activo(arrancar_con):
     imagen = a_png(np.zeros((600, 800, 3), np.uint8))
 
-    for nombre in ["vecino", "bilineal", "bicubico"]:
+    for nombre in ["vecino", "bilineal"]:
         respuesta = reescalar(arrancar_con(nombre), imagen)
 
         assert respuesta.status_code == 200
@@ -118,7 +116,7 @@ def test_cp14_x_metodo_cambia_segun_metodo_activo(arrancar_con):
         assert float(respuesta.headers["x-tiempo-ms"]) >= 0
 
 
-@pytest.mark.parametrize(("nombre", "clase"), METODOS_PROGRAMADOS)
+@pytest.mark.parametrize(("nombre", "clase"), METODOS_DEL_SPRINT)
 def test_cp14_la_imagen_sale_del_metodo_activo(arrancar_con, nombre, clase):
     """No basta con la cabecera: los píxeles deben ser los de ese método."""
     generador = np.random.default_rng(14)
@@ -128,24 +126,3 @@ def test_cp14_la_imagen_sale_del_metodo_activo(arrancar_con, nombre, clase):
     recibida = cv2.imdecode(np.frombuffer(respuesta.content, np.uint8), cv2.IMREAD_UNCHANGED)
 
     assert np.array_equal(recibida, clase().reescalar(original, 960, 720))
-
-
-# --- Método activo del Sprint 2 (CP-23) ---
-
-
-def test_cp23_metodo_activo_es_el_bicubico():
-    assert config.METODO_ACTIVO == "bicubico"
-    assert isinstance(obtener_metodo(), Bicubico)
-
-
-def test_cp23_servidor_arranca_con_el_bicubico():
-    """Sin monkeypatch: arranca con el config.py tal como queda en el repositorio."""
-    cliente = TestClient(importlib.reload(app.main).app)
-    imagen = a_png(np.zeros((600, 800, 3), np.uint8))
-
-    salud = cliente.get("/api/salud")
-    respuesta = reescalar(cliente, imagen)
-
-    assert salud.json() == {"estado": "ok", "metodo": "bicubico"}
-    assert respuesta.status_code == 200
-    assert respuesta.headers["x-metodo"] == "bicubico"
