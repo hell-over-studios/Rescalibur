@@ -3,16 +3,12 @@
 ServicioReescalado no sabe qué método de interpolación usa: lo recibe en el
 constructor (patrón Estrategia). main.py se lo entrega con obtener_metodo(),
 a partir de METODO_ACTIVO en config.py (HU-06).
-
-Desde la HU-09, cada reescalado exitoso queda guardado en RegistroMetricas.
 """
 
 import time
 from dataclasses import dataclass
-from datetime import datetime
 
 from app.metodos.base import MetodoInterpolacion
-from app.metricas import BYTES_POR_KB, Registro, RegistroMetricas
 from app.procesador import FORMATOS_ACEPTADOS, ImagenInvalidaError, ProcesadorImagen
 from app.resoluciones import CalculadoraResolucion
 
@@ -45,20 +41,17 @@ class ResultadoReescalado:
 
 
 class ServicioReescalado:
-    """Coordina ProcesadorImagen, CalculadoraResolucion, el método de interpolación y las métricas."""
+    """Coordina ProcesadorImagen, CalculadoraResolucion y el método de interpolación."""
 
     def __init__(
         self,
         procesador: ProcesadorImagen,
         calculadora: CalculadoraResolucion,
         metodo: MetodoInterpolacion,
-        registro_metricas: RegistroMetricas | None = None,
     ):
-        """registro_metricas es opcional: si no se entrega, el servicio crea uno vacío (HU-09)."""
         self.procesador = procesador
         self.calculadora = calculadora
         self.metodo = metodo
-        self.registro_metricas = registro_metricas if registro_metricas is not None else RegistroMetricas()
 
     def obtener_info(self, contenido: bytes, nombre: str) -> dict:
         """Lee la imagen y devuelve sus datos con las resoluciones disponibles (HU-01 y HU-02).
@@ -79,12 +72,10 @@ class ServicioReescalado:
     def reescalar(self, contenido: bytes, nombre: str, clave: str) -> ResultadoReescalado:
         """Reescala la imagen a la resolución elegida y la devuelve en PNG (HU-05).
 
-        Pasos: leer -> calcular dimensiones -> reescalar (midiendo el tiempo) -> codificar
-        -> registrar (HU-09).
+        Pasos: leer -> calcular dimensiones -> reescalar (midiendo el tiempo) -> codificar.
 
         Lanza ImagenDemasiadoGrandeError (413), ImagenInvalidaError (400) o
-        ValueError si la clave no existe o no amplía esta imagen (400). Si algo falla,
-        se lanza antes de registrar: las peticiones con error no quedan en las métricas.
+        ValueError si la clave no existe o no amplía esta imagen (400).
         """
         self._validar_formato(nombre)
         matriz = self.procesador.leer(contenido)
@@ -96,37 +87,13 @@ class ServicioReescalado:
         reescalada = self.metodo.reescalar(matriz, nuevo_ancho, nuevo_alto)
         tiempo_ms = (time.perf_counter() - inicio) * MILISEGUNDOS_POR_SEGUNDO
 
-        resultado = ResultadoReescalado(
+        return ResultadoReescalado(
             png=self.procesador.codificar_png(reescalada),
             ancho=nuevo_ancho,
             alto=nuevo_alto,
             metodo=self.metodo.nombre,
             tiempo_ms=tiempo_ms,
             clave=clave,
-        )
-        self._registrar(nombre, ancho, alto, resultado)
-        return resultado
-
-    def _registrar(
-        self, nombre: str, ancho_original: int, alto_original: int, resultado: ResultadoReescalado
-    ) -> None:
-        """Guarda los datos de un reescalado exitoso en RegistroMetricas (HU-09).
-
-        Se guarda el mismo tiempo_ms que va en X-Tiempo-Ms, así ambos valores coinciden.
-        """
-        self.registro_metricas.agregar(
-            Registro(
-                fecha=datetime.now(),
-                archivo=nombre,
-                metodo=resultado.metodo,
-                ancho_original=ancho_original,
-                alto_original=alto_original,
-                ancho_final=resultado.ancho,
-                alto_final=resultado.alto,
-                resolucion=resultado.clave,
-                tiempo_ms=resultado.tiempo_ms,
-                tamano_kb=len(resultado.png) / BYTES_POR_KB,
-            )
         )
 
     @staticmethod

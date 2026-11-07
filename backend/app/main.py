@@ -8,7 +8,6 @@ from fastapi import FastAPI, File, Form, HTTPException, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import CABECERAS_EXPUESTAS, ORIGENES_PERMITIDOS, obtener_metodo
-from app.metricas import RegistroMetricas
 from app.procesador import ImagenDemasiadoGrandeError, ImagenInvalidaError, ProcesadorImagen
 from app.resoluciones import CalculadoraResolucion
 from app.servicio import ServicioReescalado
@@ -28,13 +27,10 @@ app.add_middleware(
     expose_headers=CABECERAS_EXPUESTAS,
 )
 
-# Una sola instancia para toda la API.
+# Una sola instancia: no guarda estado entre peticiones, solo agrupa las clases.
 # El método sale de METODO_ACTIVO en config.py (HU-06). Se lee una vez, al arrancar:
 # por eso hay que reiniciar el servidor tras cambiarlo. Un nombre inválido detiene el arranque.
-# Su RegistroMetricas guarda las métricas mientras el servidor esté encendido (HU-09).
-servicio = ServicioReescalado(
-    ProcesadorImagen(), CalculadoraResolucion(), obtener_metodo(), RegistroMetricas()
-)
+servicio = ServicioReescalado(ProcesadorImagen(), CalculadoraResolucion(), obtener_metodo())
 
 
 @app.get("/api/salud")
@@ -72,13 +68,3 @@ async def reescalar_imagen(archivo: UploadFile = File(...), resolucion: str = Fo
     except ValueError as error:
         raise HTTPException(status_code=400, detail=str(error)) from error
     return Response(content=resultado.png, media_type="image/png", headers=resultado.cabeceras())
-
-
-@app.get("/api/metricas")
-def listar_metricas() -> list[dict]:
-    """Devuelve los reescalados exitosos en orden de ejecución (HU-09).
-
-    Es para el equipo: el frontend no la llama. Los datos viven en memoria y se
-    pierden al reiniciar el servidor (riesgo R12).
-    """
-    return [registro.a_diccionario() for registro in servicio.registro_metricas.listar()]
