@@ -11,3 +11,6 @@ opencv-python-headless
 pytest
 httpx2
 ruff
+
+# Reportes
+fpdf2
