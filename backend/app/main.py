@@ -10,8 +10,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import CABECERAS_EXPUESTAS, ORIGENES_PERMITIDOS, obtener_metodo
 from app.metricas import RegistroMetricas
 from app.procesador import ImagenDemasiadoGrandeError, ImagenInvalidaError, ProcesadorImagen
+from app.reporte import GeneradorReportePDF
 from app.resoluciones import CalculadoraResolucion
 from app.servicio import ServicioReescalado
+
+# Nombre con el que el navegador guarda el PDF de métricas (HU-10).
+NOMBRE_REPORTE = "rescalibur_metricas.pdf"
 
 app = FastAPI(
     title="Rescalibur API",
@@ -82,3 +86,20 @@ def listar_metricas() -> list[dict]:
     pierden al reiniciar el servidor (riesgo R12).
     """
     return [registro.a_diccionario() for registro in servicio.registro_metricas.listar()]
+
+
+@app.get("/api/metricas/reporte")
+def descargar_reporte() -> Response:
+    """Devuelve el PDF de métricas con los reescalados registrados hasta ahora (HU-10).
+
+    Es para el equipo: el frontend no la llama (se abre en el navegador o desde /docs).
+    El PDF se arma en memoria en cada petición y no se guarda en el servidor. Sin
+    registros también se genera: GeneradorReportePDF pone el mensaje de que aún no hay ejecuciones.
+    """
+    registros = servicio.registro_metricas.listar()
+    pdf = GeneradorReportePDF().generar(registros)
+    return Response(
+        content=bytes(pdf),  # fpdf2 entrega un bytearray y Response necesita bytes
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="{NOMBRE_REPORTE}"'},
+    )
