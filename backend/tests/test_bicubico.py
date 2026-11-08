@@ -43,3 +43,15 @@ def test_canales_conservados(bicubico):
     
     assert bicubico.reescalar(grises, 20, 20).shape[-1] == 1
     assert bicubico.reescalar(alfa, 20, 20).shape[-1] == 4
+    
+# CP-22: Rendimiento
+def test_rendimiento(bicubico):
+    import time
+    matriz = np.random.randint(0, 256, (600, 800, 3), dtype=np.uint8)
+    
+    inicio = time.time()
+    _ = bicubico.reescalar(matriz, 3840, 2160) 
+    fin = time.time()
+    
+    tiempo_ejecucion = fin - inicio
+    assert tiempo_ejecucion < 5.0, f"El método tardó {tiempo_ejecucion:.2f} s, límite es 5 s"
