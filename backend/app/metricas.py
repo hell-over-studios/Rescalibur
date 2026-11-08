@@ -3,14 +3,43 @@
 Cada reescalado exitoso deja un Registro con sus datos. RegistroMetricas los guarda
 en una lista en memoria, sin base de datos: se vacía al reiniciar el servidor (riesgo R12).
 Con esos datos se arma GET /api/metricas (HU-09) y el PDF de métricas (HU-10).
+
+Aquí también está psnr(), la medida de calidad del estudio comparativo (HU-11).
 """
 
+import math
 from dataclasses import dataclass
 from datetime import datetime
+
+import numpy as np
 
 BYTES_POR_KB = 1024
 DECIMALES_TIEMPO = 2  # Los mismos de la cabecera X-Tiempo-Ms, para que ambos valores coincidan
 DECIMALES_TAMANO = 1
+NIVEL_MAXIMO = 255  # Valor más alto de un píxel de 8 bits
+
+
+def psnr(original: np.ndarray, estimada: np.ndarray) -> float:
+    """Relación señal-ruido pico entre dos imágenes de 8 bits, en dB (HU-11).
+
+    PSNR = 10·log10(255² / MSE), con MSE el promedio del error al cuadrado de todos los
+    píxeles y canales. Más alto es mejor: 0 dB es el peor caso (negro contra blanco) y dos
+    imágenes idénticas (MSE = 0) dan infinito.
+
+    Ejemplo: un error de 5 niveles en todos los píxeles da MSE = 25 y PSNR = 34,15 dB.
+
+    Lanza ValueError si las imágenes no tienen la misma forma.
+    """
+    if original.shape != estimada.shape:
+        raise ValueError(
+            f"Las imágenes deben tener la misma forma y tienen {original.shape} y {estimada.shape}."
+        )
+    # Se resta en float64: con uint8 la resta se desborda (10 - 20 daría 246).
+    diferencia = original.astype(np.float64) - estimada.astype(np.float64)
+    error_cuadratico_medio = float(np.mean(diferencia**2))
+    if error_cuadratico_medio == 0:
+        return math.inf
+    return 10 * math.log10(NIVEL_MAXIMO**2 / error_cuadratico_medio)
 
 
 @dataclass(frozen=True)
