@@ -3,3 +3,7 @@ __pycache__/
 *.pyc
 .pytest_cache/
 .ruff_cache/
+# Resultados del estudio comparativo (HU-11): son de cada autor, no se suben.
+# Se generan con `python -m estudio.comparativo`; el .gitkeep conserva la carpeta.
+estudio/resultados/*
+!estudio/resultados/.gitkeep
