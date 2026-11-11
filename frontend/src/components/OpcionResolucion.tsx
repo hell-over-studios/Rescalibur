@@ -6,13 +6,23 @@ interface OpcionResolucionProps {
   alElegir: () => void;
 }
 
+/** Para qué sirve cada tamaño, en palabras de cualquier usuario. */
+const USO: Record<Opcion['clave'], string> = {
+  hd: 'Para compartir',
+  fullhd: 'Para tu monitor',
+  '2k': 'Pantallas grandes',
+  '4k': 'TV e impresiones',
+};
+
 /** Una opción de resolución. Es un radio nativo: se maneja con las flechas del teclado. */
 export default function OpcionResolucion({ opcion, seleccionada, alElegir }: OpcionResolucionProps) {
   return (
     <label
-      className={`flex cursor-pointer items-center justify-between gap-3 px-4 py-[18px] transition-colors md:flex-col md:items-start md:justify-start md:gap-0.5 md:px-[18px] md:py-3.5 ${
-        seleccionada ? 'bg-tinta' : 'bg-superficie hover:bg-superficie-honda'
-      } has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-tinta`}
+      className={`flex cursor-pointer items-center justify-between gap-3 rounded-2xl border-3 border-tinta px-4 py-3.5 transition-[transform,box-shadow] duration-100 md:px-[18px] ${
+        seleccionada
+          ? 'translate-x-[3px] translate-y-[3px] bg-acento shadow-none'
+          : 'bg-superficie shadow-duro hover:-translate-x-0.5 hover:-translate-y-0.5'
+      } has-[:focus-visible]:outline-4 has-[:focus-visible]:outline-offset-4 has-[:focus-visible]:outline-tinta motion-reduce:transform-none`}
     >
       <input
         type="radio"
@@ -22,16 +32,11 @@ export default function OpcionResolucion({ opcion, seleccionada, alElegir }: Opc
         onChange={alElegir}
         className="sr-only"
       />
-      <span
-        className={`font-display text-xl leading-6 font-semibold tracking-[-0.02em] md:text-[22px] md:leading-[26px] ${
-          seleccionada ? 'text-suelo' : 'text-tinta'
-        }`}
-      >
-        {opcion.nombre}
+      <span className="flex flex-col">
+        <span className="font-display text-2xl leading-7 font-extrabold tracking-[-0.03em]">{opcion.nombre}</span>
+        <span className="text-[15px] leading-5 font-bold">{USO[opcion.clave]}</span>
       </span>
-      <span
-        className={`text-base leading-[22px] font-medium md:font-normal ${seleccionada ? 'text-acento' : 'text-tinta'}`}
-      >
+      <span className="font-mono text-sm leading-5">
         {opcion.ancho} × {opcion.alto}
       </span>
     </label>

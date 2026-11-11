@@ -14,7 +14,7 @@ interface ResultadoDescargaProps {
 }
 
 const TITULO_IMAGEN =
-  'font-display text-xl leading-6 font-semibold tracking-[-0.02em] md:text-[22px] md:leading-[26px]';
+  'font-display text-xl leading-6 font-extrabold tracking-[-0.02em] md:text-[22px] md:leading-[26px]';
 
 /** Paso 3 terminado: original y reescalada a escala real, y el botón de descarga. */
 export default function ResultadoDescarga({
@@ -33,7 +33,7 @@ export default function ResultadoDescarga({
   return (
     <>
       <TituloPantalla
-        titulo="Tu imagen está lista"
+        titulo="¡Tu foto está lista!"
         subtitulo={`${infoImagen.nombre} · de ${infoImagen.ancho} × ${infoImagen.alto} a ${resultado.ancho} × ${resultado.alto} px`}
       />
 
@@ -46,8 +46,8 @@ export default function ResultadoDescarga({
             alt={`Imagen reescalada a ${resultado.ancho} × ${resultado.alto}`}
           />
           <figcaption>
-            <p className={TITULO_IMAGEN}>Reescalada</p>
-            <p className="text-tinta-2">
+            <p className={TITULO_IMAGEN}>Ahora</p>
+            <p className="font-medium">
               {resultado.ancho} × {resultado.alto} px
             </p>
           </figcaption>
@@ -61,8 +61,8 @@ export default function ResultadoDescarga({
             alt={`Imagen original de ${infoImagen.ancho} × ${infoImagen.alto}`}
           />
           <figcaption>
-            <p className={TITULO_IMAGEN}>Original</p>
-            <p className="text-tinta-2">
+            <p className={TITULO_IMAGEN}>Antes</p>
+            <p className="font-medium">
               {infoImagen.ancho} × {infoImagen.alto} px
             </p>
           </figcaption>
@@ -75,10 +75,10 @@ export default function ResultadoDescarga({
             Descargar PNG
           </Boton>
           <Boton variante="secundario" onClick={alOtraImagen}>
-            Reescalar otra imagen
+            Agrandar otra foto
           </Boton>
         </div>
-        <p className="text-base leading-[22px] text-tinta-2">Se guardará como {nombreArchivo}</p>
+        <p className="font-mono text-sm leading-5">Se guardará como {nombreArchivo}</p>
       </div>
     </>
   );

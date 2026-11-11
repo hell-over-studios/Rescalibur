@@ -1,27 +1,45 @@
-/* Único archivo CSS del proyecto. Carga Tailwind, las tipografías y los tokens del diseño (Figma · «Rescalibur»).
+/* Único archivo CSS del proyecto. Carga Tailwind, la tipografía y los tokens del diseño «Atrevida».
    Los estilos de cada componente van como clases en el propio componente. */
 @import 'tailwindcss';
 @import '@fontsource-variable/bricolage-grotesque';
-@import '@fontsource-variable/instrument-sans';
 
-/* Los nombres coinciden con las variables de Figma: color/suelo → bg-suelo, text-suelo, etc.
-   El diseño usa esquinas rectas y no usa sombras ni degradados. */
+/* Paleta lavanda. Se conservan los nombres de antes (suelo, superficie, tinta, acento) para que
+   los componentes no cambien de clases: solo cambian los valores.
+   El estilo usa bordes negros gruesos y sombras duras sin desenfoque (shadow-duro). */
 @theme {
-  --color-suelo: #f2f4f5;
-  --color-superficie: #e3e8eb;
-  --color-superficie-honda: #cdd5da;
-  --color-tinta: #0d1b24;
-  --color-tinta-2: #44545e;
-  --color-acento: #ff5a1f;
-  --color-acento-hover: #e84a10;
+  --color-suelo: #e6e0ff;
+  --color-superficie: #ffffff;
+  --color-superficie-honda: #f2f2f2;
+  --color-tinta: #111111;
+  --color-tinta-2: #3d3d3d;
+  --color-acento: #ff8a65;
+  --color-acento-hover: #ff7448;
+  --color-acento-2: #6b5cff;
 
   --font-display: 'Bricolage Grotesque Variable', system-ui, sans-serif;
-  --font-sans: 'Instrument Sans Variable', system-ui, sans-serif;
+  --font-sans: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+
+  --shadow-duro-sm: 3px 3px 0 var(--color-tinta);
+  --shadow-duro: 5px 5px 0 var(--color-tinta);
+  --shadow-duro-lg: 8px 8px 0 var(--color-tinta);
+  --shadow-acento-2: 5px 5px 0 var(--color-acento-2);
+  --shadow-panel: 10px 10px 0 var(--color-acento-2);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 body {
   min-height: 100svh;
   background-color: var(--color-suelo);
   color: var(--color-tinta);
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
 }

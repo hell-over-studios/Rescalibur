@@ -36,7 +36,7 @@ export default function DiagramaEscala({ infoImagen, claveSeleccionada, urlVista
       {orden.map((opcion) => (
         <div
           key={opcion.clave}
-          className={`absolute top-0 left-0 ${
+          className={`absolute top-0 left-0 border-3 border-tinta ${
             opcion.clave === claveSeleccionada
               ? 'bg-acento text-tinta'
               : TONOS[Math.min(sinElegida.indexOf(opcion), TONOS.length - 1)]
@@ -54,7 +54,7 @@ export default function DiagramaEscala({ infoImagen, claveSeleccionada, urlVista
       ))}
 
       <div
-        className="absolute top-0 left-0 overflow-hidden bg-suelo"
+        className="absolute top-0 left-0 overflow-hidden border-3 border-dashed border-tinta bg-suelo"
         style={{ width: pct(infoImagen.ancho, mayor.ancho), height: pct(infoImagen.alto, mayor.alto) }}
       >
         {sinVista ? (
