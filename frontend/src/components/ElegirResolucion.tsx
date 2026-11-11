@@ -36,20 +36,20 @@ export default function ElegirResolucion({
   if (opciones.length === 0) {
     return (
       <>
-        <TituloPantalla titulo="Elige la resolución" subtitulo={`${nombre} · ${ancho} × ${alto} px`} />
+        <TituloPantalla titulo="¿Qué tan grande la quieres?" subtitulo={`${nombre} · ${ancho} × ${alto} px`} />
         <div className="flex flex-col gap-6 md:grid md:grid-cols-[1.65fr_1fr]">
           <ImagenConMarco src={urlVistaPrevia} ancho={ancho} alto={alto} alt={`Vista previa de ${nombre}`} />
-          <div className="flex flex-col justify-center gap-3 bg-superficie p-6 md:p-7">
-            <h2 className="font-display text-2xl leading-7 font-semibold tracking-[-0.02em] md:text-[28px] md:leading-8">
-              Tu imagen ya supera todas las resoluciones disponibles
-            </h2>
-            <p className="text-base leading-[22px] text-tinta-2">
-              HD, Full HD, 2K y 4K son más pequeñas que {ancho} × {alto} px, así que no hay nada que ampliar.
+          <div className="flex flex-col justify-center gap-3 rounded-2xl border-3 border-tinta bg-superficie p-6 shadow-duro md:p-7">
+            <h3 className="font-display text-2xl leading-7 font-extrabold tracking-[-0.02em] md:text-[28px] md:leading-8">
+              ¡Tu foto ya es más grande que 4K!
+            </h3>
+            <p className="text-base leading-[22px] font-medium">
+              HD, Full HD, 2K y 4K son más pequeñas que {ancho} × {alto} px, así que no hace falta agrandarla.
             </p>
           </div>
         </div>
         <div>
-          <Boton onClick={alCambiarImagen}>Cargar otra imagen</Boton>
+          <Boton onClick={alCambiarImagen}>Subir otra foto</Boton>
         </div>
       </>
     );
@@ -60,11 +60,13 @@ export default function ElegirResolucion({
   return (
     <>
       <TituloPantalla
-        titulo="Elige la resolución"
+        titulo="¿Qué tan grande la quieres?"
         subtitulo={
           <>
-            <span className="md:hidden">Cada rectángulo muestra cuánto crece tu imagen.</span>
-            <span className="hidden md:inline">Cada rectángulo muestra, a escala real, cuánto crece tu imagen.</span>
+            <span className="md:hidden">Cada rectángulo muestra cuánto crece tu foto.</span>
+            <span className="hidden md:inline">
+              Cada rectángulo muestra, a escala real, cuánto crece tu foto. No se estira ni se deforma.
+            </span>
           </>
         }
       />
@@ -80,8 +82,8 @@ export default function ElegirResolucion({
 
         <div className="flex flex-col gap-2">
           <p className="flex flex-wrap gap-x-2 md:flex-col md:gap-x-0 md:gap-y-0.5 md:pb-2">
-            <span className="font-medium break-all md:text-lg md:leading-6">{nombre}</span>
-            <span className="text-tinta-2">
+            <span className="font-extrabold break-all md:text-lg md:leading-6">{nombre}</span>
+            <span className="font-medium">
               {ancho} × {alto} px
             </span>
           </p>
@@ -98,7 +100,7 @@ export default function ElegirResolucion({
           <Boton onClick={() => alReescalar(opcionElegida)}>
             {/* Un solo <span> para que el botón (flex) no recorte el espacio antes del «·». */}
             <span>
-              Reescalar a {opcionElegida.nombre}
+              Agrandar a {opcionElegida.nombre}
               <span className="hidden md:inline">
                 {' '}
                 · {opcionElegida.ancho} × {opcionElegida.alto}
@@ -106,10 +108,10 @@ export default function ElegirResolucion({
             </span>
           </Boton>
           <Boton variante="secundario" onClick={alCambiarImagen}>
-            Cambiar imagen
+            Cambiar foto
           </Boton>
         </div>
-        <p className="text-base leading-[22px] text-tinta-2">
+        <p className="text-base leading-[22px] font-medium">
           Recibirás un PNG, sin pérdida de calidad por compresión.
         </p>
       </div>

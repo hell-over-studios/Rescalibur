@@ -11,7 +11,10 @@ interface ImagenConMarcoProps {
 export default function ImagenConMarco({ src, ancho, alto, alt }: ImagenConMarcoProps) {
   const [fallo, setFallo] = useState(false);
   return (
-    <div className="relative w-full bg-superficie" style={{ aspectRatio: `${ancho} / ${alto}` }}>
+    <div
+      className="relative w-full overflow-hidden rounded-xl border-3 border-tinta bg-superficie shadow-duro"
+      style={{ aspectRatio: `${ancho} / ${alto}` }}
+    >
       {fallo ? (
         <p className="absolute inset-0 flex items-center justify-center p-2 text-center text-sm text-tinta-2">
           Sin vista previa
