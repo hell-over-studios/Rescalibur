@@ -25,6 +25,19 @@ export default function Cabecera() {
           ¿Dudas?
         </a>
         <a
+          href="https://github.com/hell-over-studios/Rescalibur"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex min-h-12 items-center gap-2 rounded-xl border-3 border-tinta bg-tinta px-4 text-base font-bold text-superficie shadow-acento-2 transition-transform duration-100 hover:-translate-x-0.5 hover:-translate-y-0.5 focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-tinta motion-reduce:transform-none"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M16 18l6-6-6-6" />
+            <path d="M8 6l-6 6 6 6" />
+          </svg>
+          GitHub
+          <span className="sr-only">(se abre en otra pestaña)</span>
+        </a>
+        <a
           href="#app"
           className="inline-flex min-h-12 items-center rounded-xl border-3 border-tinta bg-superficie px-5 text-base font-bold shadow-duro transition-transform duration-100 hover:-translate-x-0.5 hover:-translate-y-0.5 focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-tinta motion-reduce:transform-none"
         >
