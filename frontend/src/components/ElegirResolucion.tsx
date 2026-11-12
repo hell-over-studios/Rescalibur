@@ -39,7 +39,7 @@ export default function ElegirResolucion({
         <TituloPantalla titulo="¿Qué tan grande la quieres?" subtitulo={`${nombre} · ${ancho} × ${alto} px`} />
         <div className="flex flex-col gap-6 md:grid md:grid-cols-[1.65fr_1fr]">
           <ImagenConMarco src={urlVistaPrevia} ancho={ancho} alto={alto} alt={`Vista previa de ${nombre}`} />
-          <div className="flex flex-col justify-center gap-3 rounded-2xl border-3 border-tinta bg-superficie p-6 shadow-duro md:p-7">
+          <div className="flex flex-col justify-center gap-3 rounded-2xl border border-linea bg-superficie p-6 shadow-duro md:p-7">
             <h3 className="font-display text-2xl leading-7 font-extrabold tracking-[-0.02em] md:text-[28px] md:leading-8">
               ¡Tu foto ya es más grande que 4K!
             </h3>

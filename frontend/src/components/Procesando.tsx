@@ -24,11 +24,11 @@ export default function Procesando({ infoImagen, opcion, urlVistaPrevia }: Proce
         <div
           role="img"
           aria-label={`Tu imagen de ${infoImagen.ancho} × ${infoImagen.alto} dentro del marco ${opcion.nombre}`}
-          className="relative w-full border-3 border-tinta bg-acento shadow-duro"
+          className="relative w-full border border-linea bg-acento shadow-duro"
           style={{ aspectRatio: `${opcion.ancho} / ${opcion.alto}` }}
         >
           <div
-            className="absolute top-0 left-0 overflow-hidden border-3 border-dashed border-tinta bg-suelo"
+            className="absolute top-0 left-0 overflow-hidden border-2 border-dashed border-trazo bg-suelo"
             style={{
               width: `${(infoImagen.ancho / opcion.ancho) * 100}%`,
               height: `${(infoImagen.alto / opcion.alto) * 100}%`,
@@ -57,9 +57,9 @@ export default function Procesando({ infoImagen, opcion, urlVistaPrevia }: Proce
           <div
             role="progressbar"
             aria-label="Agrandando tu foto"
-            className="h-[30px] w-full overflow-hidden rounded-full border-3 border-tinta bg-superficie"
+            className="h-[30px] w-full overflow-hidden rounded-full border border-linea bg-superficie"
           >
-            <div className="h-full w-2/5 animate-pulse border-r-3 border-tinta bg-acento motion-reduce:animate-none" />
+            <div className="h-full w-2/5 animate-pulse border-r border-linea bg-acento motion-reduce:animate-none" />
           </div>
         </div>
       </div>

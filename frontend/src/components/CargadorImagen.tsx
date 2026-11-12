@@ -89,7 +89,7 @@ export default function CargadorImagen({
         }}
         onDragLeave={() => setArrastrando(false)}
         onDrop={manejarSoltar}
-        className={`flex flex-col items-center justify-center gap-3.5 rounded-[18px] border-3 border-dashed border-tinta px-5 py-12 text-center transition-colors md:py-[72px] ${
+        className={`flex flex-col items-center justify-center gap-3.5 rounded-[18px] border-2 border-dashed border-trazo px-5 py-12 text-center transition-colors md:py-[72px] ${
           deshabilitado ? 'cursor-wait' : 'cursor-pointer'
         } ${
           arrastrando ? 'bg-superficie' : 'bg-transparent hover:bg-superficie/60'

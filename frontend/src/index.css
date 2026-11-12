@@ -1,29 +1,45 @@
-/* Único archivo CSS del proyecto. Carga Tailwind, la tipografía y los tokens del diseño «Atrevida».
-   Los estilos de cada componente van como clases en el propio componente. */
+/* Único archivo CSS del proyecto. Carga Tailwind, las tipografías y los tokens del diseño.
+   Los estilos de cada componente van como clases en el propio componente.
+   El diseño es el mismo de la presentación: noche + crema, acento dorado y una espada de píxeles. */
 @import 'tailwindcss';
 @import '@fontsource-variable/bricolage-grotesque';
+@import '@fontsource-variable/instrument-sans';
+@import '@fontsource-variable/jetbrains-mono';
 
-/* Paleta lavanda. Se conservan los nombres de antes (suelo, superficie, tinta, acento) para que
-   los componentes no cambien de clases: solo cambian los valores.
-   El estilo usa bordes negros gruesos y sombras duras sin desenfoque (shadow-duro). */
+/* Se conservan los nombres de antes (suelo, superficie, tinta, acento) para que los pasos de la
+   app no cambien de clases: solo cambian los valores. */
 @theme {
-  --color-suelo: #e6e0ff;
-  --color-superficie: #ffffff;
-  --color-superficie-honda: #f2f2f2;
-  --color-tinta: #111111;
-  --color-tinta-2: #3d3d3d;
-  --color-acento: #ff8a65;
-  --color-acento-hover: #ff7448;
-  --color-acento-2: #6b5cff;
+  --color-suelo: #f4f0e8;
+  --color-superficie: #fffdf8;
+  --color-superficie-honda: #ece6d9;
+  --color-tinta: #11131a;
+  --color-tinta-2: #3a3f4c;
+  --color-apagado: #5a5f6e;
+  --color-acento: #f0b54a;
+  --color-acento-hover: #f5c46a;
+  --color-acento-oscuro: #a86a00;
+  --color-acento-2: #7fb2e5;
+  --color-acento-2-oscuro: #3e5c8a;
+  --color-linea: #e3dccd;
+  --color-trazo: #8a8473;
+
+  /* Superficies oscuras (portada, app y pie). */
+  --color-noche: #11131a;
+  --color-noche-2: #1a1d27;
+  --color-noche-borde: #2a2e3b;
+  --color-niebla: #a9afbf;
+  --color-crema: #f4f0e8;
 
   --font-display: 'Bricolage Grotesque Variable', system-ui, sans-serif;
-  --font-sans: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+  --font-sans: 'Instrument Sans Variable', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
 
-  --shadow-duro-sm: 3px 3px 0 var(--color-tinta);
-  --shadow-duro: 5px 5px 0 var(--color-tinta);
-  --shadow-duro-lg: 8px 8px 0 var(--color-tinta);
-  --shadow-acento-2: 5px 5px 0 var(--color-acento-2);
-  --shadow-panel: 10px 10px 0 var(--color-acento-2);
+  /* Sombras suaves. Se mantienen los nombres de antes. */
+  --shadow-duro-sm: 0 1px 2px rgb(17 19 26 / 0.06);
+  --shadow-duro: 0 1px 2px rgb(17 19 26 / 0.05), 0 8px 24px rgb(17 19 26 / 0.07);
+  --shadow-duro-lg: 0 2px 4px rgb(17 19 26 / 0.06), 0 18px 48px rgb(17 19 26 / 0.12);
+  --shadow-acento-2: 0 8px 24px rgb(240 181 74 / 0.25);
+  --shadow-panel: 0 30px 80px rgb(0 0 0 / 0.45);
 }
 
 html {

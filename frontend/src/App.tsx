@@ -117,21 +117,23 @@ export default function App() {
       <main>
         <Portada />
 
-        {/* Sección negra con la app: título, barra de pasos y el panel del paso actual. */}
-        <section id="app" aria-labelledby="titulo-app" className="scroll-mt-4 border-t-4 border-tinta bg-tinta text-superficie">
+        {/* Sección oscura con la app: título, barra de pasos y el panel del paso actual. */}
+        <section id="app" aria-labelledby="titulo-app" className="scroll-mt-4 bg-noche text-crema">
           <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-6 px-4 py-16 md:gap-8 md:px-6 md:py-24">
-            <h2
-              id="titulo-app"
-              className="font-display text-[40px] leading-[0.95] font-extrabold tracking-[-0.03em] md:text-[clamp(40px,5.6vw,76px)]"
-            >
-              Tres toques
-              <br />y <span className="text-acento">listo.</span>
-            </h2>
+            <div className="flex flex-col gap-4">
+              <p className="font-mono text-[13px] font-semibold tracking-[0.2em] text-acento uppercase">Pruébalo</p>
+              <h2
+                id="titulo-app"
+                className="font-display text-[44px] leading-[0.95] font-extrabold tracking-[-0.04em] md:text-[clamp(48px,6vw,80px)]"
+              >
+                Tres pasos y <span className="text-acento">listo.</span>
+              </h2>
+            </div>
 
             <BarraPasos paso={PASO_DE_ETAPA[etapa]} />
 
             {/* Panel del paso actual. La lógica de cada paso es la misma de antes del rediseño. */}
-            <div className="flex flex-col gap-6 rounded-3xl border-3 border-superficie bg-suelo p-[18px] text-tinta shadow-panel md:gap-8 md:p-8">
+            <div className="flex flex-col gap-6 rounded-3xl bg-suelo p-[18px] text-tinta shadow-panel md:gap-8 md:p-8">
               {(etapa === 'cargar' || etapa === 'leyendo') && (
                 <CargadorImagen
                   alSeleccionarArchivo={manejarArchivo}

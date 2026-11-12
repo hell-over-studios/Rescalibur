@@ -12,7 +12,7 @@ export default function ImagenConMarco({ src, ancho, alto, alt }: ImagenConMarco
   const [fallo, setFallo] = useState(false);
   return (
     <div
-      className="relative w-full overflow-hidden rounded-xl border-3 border-tinta bg-superficie shadow-duro"
+      className="relative w-full overflow-hidden rounded-xl border border-linea bg-superficie shadow-duro"
       style={{ aspectRatio: `${ancho} / ${alto}` }}
     >
       {fallo ? (

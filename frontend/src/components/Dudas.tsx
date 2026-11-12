@@ -21,19 +21,18 @@ const PREGUNTAS = [
 /** Preguntas frecuentes. Cada una se abre y se cierra (details nativo, funciona con teclado). */
 export default function Dudas() {
   return (
-    <section id="dudas" className="mx-auto flex w-full max-w-[860px] scroll-mt-6 flex-col gap-3.5 px-4 py-20 md:px-6 md:pt-24 md:pb-28">
-      <h2 className="mb-2.5 font-display text-[40px] leading-[0.95] font-extrabold tracking-[-0.04em] md:text-[64px]">
-        ¿Dudas?
-      </h2>
+    <section id="dudas" className="mx-auto flex w-full max-w-[860px] scroll-mt-6 flex-col gap-3 px-4 py-20 md:px-6 md:pt-24 md:pb-28">
+      <p className="font-mono text-[13px] font-semibold tracking-[0.2em] text-acento-oscuro uppercase">Preguntas</p>
+      <h2 className="mb-4 font-display text-[44px] leading-[0.95] font-extrabold tracking-[-0.04em] md:text-[64px]">¿Dudas?</h2>
       {PREGUNTAS.map(({ pregunta, respuesta }) => (
-        <details key={pregunta} className="group rounded-2xl border-3 border-tinta bg-superficie px-5 py-[18px] shadow-duro">
-          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-[19px] font-extrabold focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-tinta [&::-webkit-details-marker]:hidden">
+        <details key={pregunta} className="group rounded-2xl border border-linea bg-superficie px-6 py-5 open:shadow-duro">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-lg font-semibold focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-tinta [&::-webkit-details-marker]:hidden">
             {pregunta}
-            <span aria-hidden="true" className="text-[28px] leading-none transition-transform group-open:rotate-45">
+            <span aria-hidden="true" className="font-mono text-2xl leading-none text-acento-oscuro transition-transform group-open:rotate-45">
               +
             </span>
           </summary>
-          <p className="mt-2.5 text-[17px]">{respuesta}</p>
+          <p className="mt-3 text-[17px] leading-7 text-tinta-2">{respuesta}</p>
         </details>
       ))}
     </section>
