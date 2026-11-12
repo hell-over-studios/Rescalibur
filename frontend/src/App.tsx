@@ -1,7 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
+import BarraPasos from './components/BarraPasos';
 import Cabecera from './components/Cabecera';
 import CargadorImagen from './components/CargadorImagen';
+import Dudas from './components/Dudas';
 import ElegirResolucion from './components/ElegirResolucion';
+import PiePagina from './components/PiePagina';
+import Portada from './components/Portada';
 import Procesando from './components/Procesando';
 import ResultadoDescarga from './components/ResultadoDescarga';
 import { obtenerInfoImagen, reescalarImagen } from './services/api';
@@ -108,39 +112,69 @@ export default function App() {
   const opcionElegida = infoImagen?.opciones.find((opcion) => opcion.clave === claveResolucion);
 
   return (
-    <div className="mx-auto flex w-full max-w-[860px] flex-col gap-6 px-4 pt-6 pb-10 md:gap-10 md:px-6 md:pt-10 md:pb-24">
-      <Cabecera paso={PASO_DE_ETAPA[etapa]} />
+    <>
+      <Cabecera />
+      <main>
+        <Portada />
 
-      {(etapa === 'cargar' || etapa === 'leyendo') && (
-        <CargadorImagen alSeleccionarArchivo={manejarArchivo} deshabilitado={etapa === 'leyendo'} error={error} />
-      )}
+        {/* Sección oscura con la app: título, barra de pasos y el panel del paso actual. */}
+        <section id="app" aria-labelledby="titulo-app" className="scroll-mt-4 bg-noche text-crema">
+          <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-6 px-4 py-16 md:gap-8 md:px-6 md:py-24">
+            <div className="flex flex-col gap-4">
+              <p className="font-mono text-[13px] font-semibold tracking-[0.2em] text-acento uppercase">Pruébalo</p>
+              <h2
+                id="titulo-app"
+                className="font-display text-[44px] leading-[0.95] font-extrabold tracking-[-0.04em] md:text-[clamp(48px,6vw,80px)]"
+              >
+                Tres pasos y <span className="text-acento">listo.</span>
+              </h2>
+            </div>
 
-      {etapa === 'elegir' && infoImagen && urlVistaPrevia && (
-        <ElegirResolucion
-          infoImagen={infoImagen}
-          urlVistaPrevia={urlVistaPrevia}
-          claveSeleccionada={claveResolucion}
-          alSeleccionar={setClaveResolucion}
-          error={error}
-          alReescalar={manejarReescalar}
-          alCambiarImagen={manejarReinicio}
-        />
-      )}
+            <BarraPasos paso={PASO_DE_ETAPA[etapa]} />
 
-      {etapa === 'procesando' && infoImagen && opcionElegida && urlVistaPrevia && (
-        <Procesando infoImagen={infoImagen} opcion={opcionElegida} urlVistaPrevia={urlVistaPrevia} />
-      )}
+            {/* Panel del paso actual. La lógica de cada paso es la misma de antes del rediseño. */}
+            <div className="flex flex-col gap-6 rounded-3xl bg-suelo p-[18px] text-tinta shadow-panel md:gap-8 md:p-8">
+              {(etapa === 'cargar' || etapa === 'leyendo') && (
+                <CargadorImagen
+                  alSeleccionarArchivo={manejarArchivo}
+                  deshabilitado={etapa === 'leyendo'}
+                  error={error}
+                />
+              )}
 
-      {etapa === 'listo' && infoImagen && opcionElegida && resultado && urlVistaPrevia && urlResultado && (
-        <ResultadoDescarga
-          infoImagen={infoImagen}
-          opcion={opcionElegida}
-          resultado={resultado}
-          urlVistaPrevia={urlVistaPrevia}
-          urlResultado={urlResultado}
-          alOtraImagen={manejarReinicio}
-        />
-      )}
-    </div>
+              {etapa === 'elegir' && infoImagen && urlVistaPrevia && (
+                <ElegirResolucion
+                  infoImagen={infoImagen}
+                  urlVistaPrevia={urlVistaPrevia}
+                  claveSeleccionada={claveResolucion}
+                  alSeleccionar={setClaveResolucion}
+                  error={error}
+                  alReescalar={manejarReescalar}
+                  alCambiarImagen={manejarReinicio}
+                />
+              )}
+
+              {etapa === 'procesando' && infoImagen && opcionElegida && urlVistaPrevia && (
+                <Procesando infoImagen={infoImagen} opcion={opcionElegida} urlVistaPrevia={urlVistaPrevia} />
+              )}
+
+              {etapa === 'listo' && infoImagen && opcionElegida && resultado && urlVistaPrevia && urlResultado && (
+                <ResultadoDescarga
+                  infoImagen={infoImagen}
+                  opcion={opcionElegida}
+                  resultado={resultado}
+                  urlVistaPrevia={urlVistaPrevia}
+                  urlResultado={urlResultado}
+                  alOtraImagen={manejarReinicio}
+                />
+              )}
+            </div>
+          </div>
+        </section>
+
+        <Dudas />
+      </main>
+      <PiePagina />
+    </>
   );
 }

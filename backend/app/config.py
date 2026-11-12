@@ -5,6 +5,7 @@ obtener_metodo(), que convierte METODO_ACTIVO en el método de interpolación (H
 """
 
 from app.metodos.base import MetodoInterpolacion
+from app.metodos.bicubico import Bicubico
 from app.metodos.bilineal import Bilineal
 from app.metodos.vecino import VecinoMasCercano
 
@@ -19,16 +20,17 @@ ORIGENES_PERMITIDOS = [
 # Sin declararlas aquí, el navegador las oculta aunque el servidor las envíe.
 CABECERAS_EXPUESTAS = ["X-Metodo", "X-Tiempo-Ms", "X-Ancho", "X-Alto"]
 
-# Método de interpolación que usa la API (HU-06): "vecino" o "bilineal".
+# Método de interpolación que usa la API (HU-06): "vecino", "bilineal" o "bicubico".
 # Para cambiarlo: editar este valor y reiniciar el servidor.
-# En el Sprint 2 se agrega "bicubico".
-METODO_ACTIVO = "bilineal"
+# Desde el Sprint 2 el activo es el bicúbico, el método objetivo (HU-08).
+METODO_ACTIVO = "bicubico"
 
 # Nombre -> clase. La clave sale del atributo nombre de cada clase, así el texto
 # de METODO_ACTIVO y el de la cabecera X-Metodo son siempre el mismo.
 METODOS_DISPONIBLES: dict[str, type[MetodoInterpolacion]] = {
     VecinoMasCercano.nombre: VecinoMasCercano,
     Bilineal.nombre: Bilineal,
+    Bicubico.nombre: Bicubico,
 }
 
 

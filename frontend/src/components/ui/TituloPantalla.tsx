@@ -6,7 +6,10 @@ interface TituloPantallaProps {
   subtitulo?: ReactNode;
 }
 
-/** Título de cada pantalla. Al aparecer recibe el foco para que los lectores de pantalla anuncien el cambio de paso. */
+/**
+ * Título de cada paso. Es un h2 porque el h1 de la página está en la portada.
+ * Al aparecer recibe el foco para que los lectores de pantalla anuncien el cambio de paso.
+ */
 export default function TituloPantalla({ titulo, subtitulo }: TituloPantallaProps) {
   const ref = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
@@ -14,15 +17,15 @@ export default function TituloPantalla({ titulo, subtitulo }: TituloPantallaProp
   }, []);
 
   return (
-    <header className="flex flex-col gap-2 md:gap-3">
-      <h1
+    <header className="flex flex-col gap-1.5 md:gap-2">
+      <h2
         ref={ref}
         tabIndex={-1}
-        className="font-display text-[32px] leading-9 font-semibold tracking-[-0.03em] outline-none md:text-[44px] md:leading-12"
+        className="font-display text-[28px] leading-8 font-extrabold tracking-[-0.03em] outline-none md:text-[34px] md:leading-[38px]"
       >
         {titulo}
-      </h1>
-      {subtitulo && <p className="text-base leading-[22px] text-tinta-2 md:text-lg md:leading-[26px]">{subtitulo}</p>}
+      </h2>
+      {subtitulo && <p className="text-base leading-[22px] font-medium md:text-lg md:leading-[26px]">{subtitulo}</p>}
     </header>
   );
 }

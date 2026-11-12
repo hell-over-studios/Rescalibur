@@ -1,27 +1,61 @@
-/* Único archivo CSS del proyecto. Carga Tailwind, las tipografías y los tokens del diseño (Figma · «Rescalibur»).
-   Los estilos de cada componente van como clases en el propio componente. */
+/* Único archivo CSS del proyecto. Carga Tailwind, las tipografías y los tokens del diseño.
+   Los estilos de cada componente van como clases en el propio componente.
+   El diseño es el mismo de la presentación: noche + crema, acento dorado y una espada de píxeles. */
 @import 'tailwindcss';
 @import '@fontsource-variable/bricolage-grotesque';
 @import '@fontsource-variable/instrument-sans';
+@import '@fontsource-variable/jetbrains-mono';
 
-/* Los nombres coinciden con las variables de Figma: color/suelo → bg-suelo, text-suelo, etc.
-   El diseño usa esquinas rectas y no usa sombras ni degradados. */
+/* Se conservan los nombres de antes (suelo, superficie, tinta, acento) para que los pasos de la
+   app no cambien de clases: solo cambian los valores. */
 @theme {
-  --color-suelo: #f2f4f5;
-  --color-superficie: #e3e8eb;
-  --color-superficie-honda: #cdd5da;
-  --color-tinta: #0d1b24;
-  --color-tinta-2: #44545e;
-  --color-acento: #ff5a1f;
-  --color-acento-hover: #e84a10;
+  --color-suelo: #f4f0e8;
+  --color-superficie: #fffdf8;
+  --color-superficie-honda: #ece6d9;
+  --color-tinta: #11131a;
+  --color-tinta-2: #3a3f4c;
+  --color-apagado: #5a5f6e;
+  --color-acento: #f0b54a;
+  --color-acento-hover: #f5c46a;
+  --color-acento-oscuro: #a86a00;
+  --color-acento-2: #7fb2e5;
+  --color-acento-2-oscuro: #3e5c8a;
+  --color-linea: #e3dccd;
+  --color-trazo: #8a8473;
+
+  /* Superficies oscuras (portada, app y pie). */
+  --color-noche: #11131a;
+  --color-noche-2: #1a1d27;
+  --color-noche-borde: #2a2e3b;
+  --color-niebla: #a9afbf;
+  --color-crema: #f4f0e8;
 
   --font-display: 'Bricolage Grotesque Variable', system-ui, sans-serif;
   --font-sans: 'Instrument Sans Variable', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+
+  /* Sombras suaves. Se mantienen los nombres de antes. */
+  --shadow-duro-sm: 0 1px 2px rgb(17 19 26 / 0.06);
+  --shadow-duro: 0 1px 2px rgb(17 19 26 / 0.05), 0 8px 24px rgb(17 19 26 / 0.07);
+  --shadow-duro-lg: 0 2px 4px rgb(17 19 26 / 0.06), 0 18px 48px rgb(17 19 26 / 0.12);
+  --shadow-acento-2: 0 8px 24px rgb(240 181 74 / 0.25);
+  --shadow-panel: 0 30px 80px rgb(0 0 0 / 0.45);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 body {
   min-height: 100svh;
   background-color: var(--color-suelo);
   color: var(--color-tinta);
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
 }

@@ -16,7 +16,7 @@ export default function Procesando({ infoImagen, opcion, urlVistaPrevia }: Proce
   return (
     <>
       <TituloPantalla
-        titulo="Reescalando tu imagen…"
+        titulo="Agrandando tu foto…"
         subtitulo={`${infoImagen.nombre} · de ${infoImagen.ancho} × ${infoImagen.alto} a ${opcion.ancho} × ${opcion.alto} px`}
       />
 
@@ -24,11 +24,11 @@ export default function Procesando({ infoImagen, opcion, urlVistaPrevia }: Proce
         <div
           role="img"
           aria-label={`Tu imagen de ${infoImagen.ancho} × ${infoImagen.alto} dentro del marco ${opcion.nombre}`}
-          className="relative w-full bg-acento"
+          className="relative w-full border border-linea bg-acento shadow-duro"
           style={{ aspectRatio: `${opcion.ancho} / ${opcion.alto}` }}
         >
           <div
-            className="absolute top-0 left-0 overflow-hidden bg-suelo"
+            className="absolute top-0 left-0 overflow-hidden border-2 border-dashed border-trazo bg-suelo"
             style={{
               width: `${(infoImagen.ancho / opcion.ancho) * 100}%`,
               height: `${(infoImagen.alto / opcion.alto) * 100}%`,
@@ -51,21 +51,21 @@ export default function Procesando({ infoImagen, opcion, urlVistaPrevia }: Proce
 
         {/* En celular la barra va primero; desde md, el texto va primero. */}
         <div className="flex flex-col-reverse gap-4 md:flex-col">
-          <p className="text-base leading-[22px] md:text-lg md:leading-[26px]">
-            Esto puede tardar unos segundos con imágenes grandes. No cierres la página.
+          <p className="text-base leading-[22px] font-medium md:text-lg md:leading-[26px]">
+            Esto puede tardar unos segundos con fotos grandes. No cierres la página.
           </p>
           <div
             role="progressbar"
-            aria-label="Reescalando imagen"
-            className="h-2 w-full overflow-hidden bg-superficie-honda"
+            aria-label="Agrandando tu foto"
+            className="h-[30px] w-full overflow-hidden rounded-full border border-linea bg-superficie"
           >
-            <div className="h-full w-2/5 animate-pulse bg-tinta motion-reduce:animate-none" />
+            <div className="h-full w-2/5 animate-pulse border-r border-linea bg-acento motion-reduce:animate-none" />
           </div>
         </div>
       </div>
 
       <div>
-        <Boton variante="deshabilitado">Reescalando…</Boton>
+        <Boton variante="deshabilitado">Agrandando…</Boton>
       </div>
     </>
   );

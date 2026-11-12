@@ -3,8 +3,6 @@ import type { ChangeEvent, DragEvent } from 'react';
 import { EXTENSIONES_PERMITIDAS, TAMANO_MAXIMO_MB } from '../constantes';
 import type { MensajeError } from '../tipos';
 import AvisoError from './ui/AvisoError';
-import { clasesBoton } from './ui/clasesBoton';
-import TituloPantalla from './ui/TituloPantalla';
 
 interface CargadorImagenProps {
   /** Se llama cuando el usuario elige un archivo que pasa la validación. */
@@ -44,7 +42,8 @@ function validarArchivo(archivo: File): MensajeError | null {
 }
 
 /**
- * Paso 1 (HU-01): zona para cargar la imagen con botón, con toque o arrastrando el archivo.
+ * Paso 1 (HU-01): zona para cargar la imagen con clic, con toque o arrastrando el archivo.
+ * No lleva título propio: el título «Tres toques y listo» y la barra de pasos ya dicen en qué paso va.
  * Toda la zona es un <label> del input de archivo, así que funciona con clic, toque (en celular no se
  * puede arrastrar) y teclado.
  */
@@ -81,16 +80,6 @@ export default function CargadorImagen({
 
   return (
     <>
-      <TituloPantalla
-        titulo="Carga tu imagen"
-        subtitulo={
-          <>
-            <span className="md:hidden">La reescalamos y la descargas en PNG.</span>
-            <span className="hidden md:inline">La reescalamos a HD, Full HD, 2K o 4K y la descargas en PNG.</span>
-          </>
-        }
-      />
-
       {errorVisible && <AvisoError {...errorVisible} />}
 
       <label
@@ -100,9 +89,11 @@ export default function CargadorImagen({
         }}
         onDragLeave={() => setArrastrando(false)}
         onDrop={manejarSoltar}
-        className={`flex cursor-pointer flex-col items-center justify-center gap-4 px-5 py-10 text-center transition-colors md:gap-5 md:px-10 md:py-20 ${
-          arrastrando ? 'bg-superficie-honda' : 'bg-superficie'
-        } has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-tinta`}
+        className={`flex flex-col items-center justify-center gap-3.5 rounded-[18px] border-2 border-dashed border-trazo px-5 py-12 text-center transition-colors md:py-[72px] ${
+          deshabilitado ? 'cursor-wait' : 'cursor-pointer'
+        } ${
+          arrastrando ? 'bg-superficie' : 'bg-transparent hover:bg-superficie/60'
+        } has-[:focus-visible]:outline-4 has-[:focus-visible]:outline-offset-4 has-[:focus-visible]:outline-tinta`}
       >
         <input
           type="file"
@@ -111,16 +102,31 @@ export default function CargadorImagen({
           disabled={deshabilitado}
           className="sr-only"
         />
-        <span className="font-display text-[26px] leading-[30px] font-semibold tracking-[-0.03em] md:text-[40px] md:leading-[44px]">
-          <span className="md:hidden">Toca para elegir tu imagen</span>
-          <span className="hidden md:inline">Arrastra tu imagen aquí</span>
+        <span
+          aria-hidden="true"
+          className="inline-flex size-[72px] items-center justify-center rounded-full bg-tinta text-suelo"
+        >
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 16V4" />
+            <path d="M7 9l5-5 5 5" />
+            <path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3" />
+          </svg>
         </span>
-        <span className="hidden text-base text-tinta-2 md:block">o</span>
-        <span className={clasesBoton(deshabilitado ? 'deshabilitado' : 'primario')}>
-          {deshabilitado ? 'Leyendo imagen…' : 'Elegir imagen'}
+        <span className="font-display text-[26px] leading-[30px] font-extrabold tracking-[-0.03em] md:text-[34px] md:leading-9">
+          {deshabilitado ? (
+            'Leyendo tu foto…'
+          ) : arrastrando ? (
+            '¡Suéltala!'
+          ) : (
+            <>
+              <span className="md:hidden">Toca para elegir tu foto</span>
+              <span className="hidden md:inline">Arrastra tu foto aquí</span>
+            </>
+          )}
         </span>
-        <span className="text-base leading-[22px] text-tinta-2">
-          JPG, JPEG, PNG, BMP, WEBP o TIFF · máximo {TAMANO_MAXIMO_MB} MB
+        <span className="text-base leading-[22px] font-medium">
+          <span className="hidden md:inline">o toca para elegirla · </span>
+          JPG, PNG, WEBP, BMP o TIFF · máximo {TAMANO_MAXIMO_MB} MB
         </span>
       </label>
     </>
