@@ -10,17 +10,17 @@ function estadoDe(indice: number, paso: Paso): Estado {
   return indice === actual ? 'actual' : 'pendiente';
 }
 
-// La barra vive sobre el fondo negro de la sección de la app.
+// La barra vive sobre el fondo oscuro de la sección de la app.
 const CLASES_ESCRITORIO: Record<Estado, string> = {
-  hecho: 'border-superficie bg-tinta text-superficie',
+  hecho: 'border-noche-borde bg-noche-2 text-crema',
   actual: 'border-acento bg-acento text-tinta',
-  pendiente: 'border-[#4a4a4a] bg-tinta text-[#8c8c8c]',
+  pendiente: 'border-noche-borde bg-noche text-[#6e7486]',
 };
 
 const CLASES_CELULAR: Record<Estado, string> = {
-  hecho: 'bg-superficie',
+  hecho: 'bg-crema',
   actual: 'bg-acento',
-  pendiente: 'bg-[#4a4a4a]',
+  pendiente: 'bg-noche-borde',
 };
 
 /** Barra de 3 pasos. En celular se compacta a tres segmentos y el nombre del paso actual. */
@@ -34,9 +34,9 @@ export default function BarraPasos({ paso }: { paso: Paso }) {
             <li
               key={nombre}
               aria-current={estado === 'actual' ? 'step' : undefined}
-              className={`flex min-h-16 flex-1 items-center gap-3 rounded-[14px] border-3 px-4 py-2.5 ${CLASES_ESCRITORIO[estado]}`}
+              className={`flex min-h-16 flex-1 items-center gap-3 rounded-2xl border px-4 py-2.5 ${CLASES_ESCRITORIO[estado]}`}
             >
-              <span className="inline-flex size-[34px] flex-none items-center justify-center rounded-full border-2 border-current font-extrabold">
+              <span className="inline-flex size-[34px] flex-none items-center justify-center rounded-full border border-current font-mono text-sm font-bold">
                 {i + 1}
               </span>
               <span className="truncate text-[17px] font-extrabold">{nombre}</span>

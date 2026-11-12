@@ -18,7 +18,7 @@ const USO: Record<Opcion['clave'], string> = {
 export default function OpcionResolucion({ opcion, seleccionada, alElegir }: OpcionResolucionProps) {
   return (
     <label
-      className={`flex cursor-pointer items-center justify-between gap-3 rounded-2xl border-3 border-tinta px-4 py-3.5 transition-[transform,box-shadow] duration-100 md:px-[18px] ${
+      className={`flex cursor-pointer items-center justify-between gap-3 rounded-2xl border border-linea px-4 py-3.5 transition-[transform,box-shadow] duration-100 md:px-[18px] ${
         seleccionada
           ? 'translate-x-[3px] translate-y-[3px] bg-acento shadow-none'
           : 'bg-superficie shadow-duro hover:-translate-x-0.5 hover:-translate-y-0.5'
